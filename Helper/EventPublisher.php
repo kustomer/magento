@@ -20,9 +20,9 @@ function toPlainArray($obj)
 
 class EventPublisher extends AbstractHelper
 {
-    const XML_PATH_EVENT = 'kustomer/integration/';
-    const XML_PATH_ENABLED = 'kustomer/integration/enabled';
-    const XML_PATH_API_KEY = 'kustomer/integration/api-key';
+    const XML_PATH_EVENT = 'kustomer/event/';
+    const XML_PATH_ENABLED = 'kustomer/integration/active';
+    const XML_PATH_API_KEY = 'kustomer/integration/api_key';
     const API_ENDPOINT = 'events';
     const ACCEPT_HEADER = 'application/json';
     const BASE_KUSTOMER_URI = 'https://api.kustomerapp.com/v1/magento/customers/';

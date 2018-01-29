@@ -1,0 +1,14 @@
+version: '3'
+services:
+  magento:
+    build: .
+    env_file: .env
+    volumes:
+      - ./:/var/www/html/app/code/Kustomer/KustomerIntegration
+    ports:
+      - "3333:80"
+  db:
+    image: mysql
+    env_file: .env
+    volumes:
+      - ~/data/mysql:/var/lib/mysql

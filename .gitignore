@@ -66,4 +66,6 @@ atlassian*
 !/vendor/.htaccess
 /generated/*
 !/generated/.htaccess
+/magento2
 .DS_Store
+.env
