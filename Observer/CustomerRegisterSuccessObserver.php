@@ -19,6 +19,7 @@ class CustomerRegisterSuccessObserver extends KustomerEventObserver
          */
         $customer = $observer->getEvent()->getCustomer();
         $eventName = $observer->getEventName();
+        $data = [ 'customer' => $customer ];
 
         if (empty($customer))
         {
@@ -26,6 +27,6 @@ class CustomerRegisterSuccessObserver extends KustomerEventObserver
         }
 
         $store = $customer->getStore();
-        $this->publish($eventName, $customer, $store);
+        $this->publish($eventName, $customer, $data, $store);
     }
 }

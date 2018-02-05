@@ -28,13 +28,13 @@ abstract class KustomerEventObserver implements ObserverInterface
     }
 
     /**
-     * @param string $eventName
-     * @param Customer $customer
-     * @param array $data
-     * @param Store|int|null $store
+     * @param string $eventName - The name of the event being emitted
+     * @param Customer $customer - The customer object from Magento
+     * @param array $data - An associated array of objects to be sent to Kustomer. Each key should match the type of object being sent. (i.e. "order" => $order_object)
+     * @param Store|int|null $store - The store ID or store object the event was emitted from
      */
     public function publish($eventName, $customer, $data = [], $store = null)
     {
-        $this->__eventPublisher->publish($eventName, $customer, $store, $data);
+        $this->__eventPublisher->publish($eventName, $customer, $data, $store);
     }
 }

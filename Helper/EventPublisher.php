@@ -30,12 +30,16 @@ class EventPublisher extends AbstractHelper
     const PUBLISH_METHOD = 'POST';
     const USER_AGENT = 'kustomer-magento-extension/';
     const VERSION = '0.0.1';
+    /**
+     * @todo Dynamically load built-in event handlers rather than hard-coding here
+     */
+    const BUILTINS = ['sales_order_place_after', 'customer_register_success', 'customer_address_save_after', 'order_cancel_after'];
 
     /**
      * @param string $uri
      * @param string|null $body
      * @param Store|null $store
-     * @return array
+     * @return boolean
      */
     protected function __request($uri, $body = null, $store = null)
     {
@@ -61,12 +65,12 @@ class EventPublisher extends AbstractHelper
         /**
          * @todo Some kind of retry logic or error logging
          */
-        if ($statusCode >= 500)
+        if ($statusCode >= 400)
         {
-            return [];
+            return false;
         }
 
-        return json_decode($res->getBody());
+        return true;
     }
 
     /**
@@ -104,6 +108,10 @@ class EventPublisher extends AbstractHelper
      */
     protected function __isEventEnabled($eventName, $store = null)
     {
+        if (in_array($eventName, self::BUILTINS) === false)
+        {
+            return true;
+        }
         return $this->scopeConfig->isSetFlag(self::XML_PATH_EVENT.$eventName, ScopeInterface::SCOPE_STORE, $store);
     }
 

@@ -16,18 +16,13 @@ class CustomerAddressSaveAfterObserver extends KustomerEventObserver
     public function execute(EventObserver $observer)
     {
         /**
-         * @var Address $customerAddress
          * @var Customer $customer
          */
         $eventName = $observer->getEventName();
         $customerAddress = $observer->getCustomerAddress();
         $customer = $customerAddress->getCustomer();
-        $store = $customer->getStore();
+        $data = [ 'customer' => $customer ];
 
-        $data = [
-          'address' => $customerAddress
-        ];
-
-        $this->publish($eventName, $customer, $data, $store);
+        $this->publish($eventName, $customer, $data);
     }
 }

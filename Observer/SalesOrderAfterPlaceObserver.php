@@ -29,7 +29,6 @@ class SalesOrderAfterPlaceObserver extends KustomerEventObserver
 
         $store = $order->getStore();
         $customer = $order->getCustomer();
-        // $items = $order->getAllItems();
 
         if (!$this->__eventPublisher->isKustomerIntegrationEnabled($store))
         {
