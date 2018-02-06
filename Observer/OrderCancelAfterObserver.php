@@ -24,10 +24,7 @@ class OrderCancelAfterObserver extends KustomerEventObserver
         $customer = $order->getCustomer();
         $store = $customer->getStore();
 
-        $data = [
-          'order' => $order
-        ];
-
-        $this->publish($eventName, $customer, $data, $store);
+        $dataType = 'order';
+        $this->publish($eventName, $dataType, $customer, $order, $store);
     }
 }

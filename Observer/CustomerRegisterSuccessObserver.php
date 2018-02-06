@@ -19,14 +19,13 @@ class CustomerRegisterSuccessObserver extends KustomerEventObserver
          */
         $customer = $observer->getEvent()->getCustomer();
         $eventName = $observer->getEventName();
-        $data = [ 'customer' => $customer ];
 
         if (empty($customer))
         {
             return;
         }
 
-        $store = $customer->getStore();
-        $this->publish($eventName, $customer, $data, $store);
+        $dataType = 'customer';
+        $this->publish($eventName, $dataType, $customer);
     }
 }

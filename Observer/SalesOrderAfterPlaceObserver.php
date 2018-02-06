@@ -16,29 +16,27 @@ class SalesOrderAfterPlaceObserver extends KustomerEventObserver
     {
         /**
          * @var Order $order
-         * @var Store $store
          * @var Customer $customer
+         * @var Store $store
          */
         $order = $observer->getEvent()->getOrder();
         $eventName = $observer->getEventName();
+        $customer = $order->getCustomer();
+        $store = $order->getStore();
 
         if (empty($order))
         {
             return;
         }
 
-        $store = $order->getStore();
-        $customer = $order->getCustomer();
 
         if (!$this->__eventPublisher->isKustomerIntegrationEnabled($store))
         {
             return;
         }
 
-        $data = [
-            'order' => $order
-        ];
-
-        $this->publish($eventName, $customer, $data, $store);
+        $objectType = 'order';
+        $data = $order;
+        $this->publish($eventName, $objectType, $customer, $data, $store);
     }
 }

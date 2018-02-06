@@ -4,6 +4,7 @@ namespace Kustomer\KustomerIntegration\Helper;
 
 use GuzzleHttp\Client;
 use Magento\Customer\Model\Customer;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Store\Model\Store;
@@ -15,7 +16,7 @@ use Magento\Store\Model\ScopeInterface;
  */
 function toPlainArray($obj)
 {
-    return $obj->getData();
+    return $obj->toArray();
 }
 
 class EventPublisher extends AbstractHelper
@@ -30,6 +31,11 @@ class EventPublisher extends AbstractHelper
     const PUBLISH_METHOD = 'POST';
     const USER_AGENT = 'kustomer-magento-extension/';
     const VERSION = '0.0.1';
+    /*
+     * @todo make these configurable from the admin site
+     */
+    const CUSTOMER_EXPORT_FIELDS = ['id', 'firstname', 'lastname', 'email', 'dob', 'created_at', 'updated_at'];
+
     /**
      * @todo Dynamically load built-in event handlers rather than hard-coding here
      */
@@ -116,6 +122,21 @@ class EventPublisher extends AbstractHelper
     }
 
     /**
+     * @param Customer $customer
+     * @return array
+     */
+    protected function __serializeCustomer($customer)
+    {
+        $customer_array = $customer->toArray();
+//        $customer_array['id'] = $customer->getId();
+//        $customer_interface = $customer->getData();
+//        $extension_attributes = $customer_interface->getExtensionAttributes();
+//        $custom_attributes = $customer_interface->getCustomAttributes();
+//        return array_merge($customer_array, $custom_attributes, $extension_attributes);
+        return $customer_array;
+    }
+
+    /**
      * @param string $eventName
      * @param Store|null $store
      * @return bool
@@ -130,11 +151,12 @@ class EventPublisher extends AbstractHelper
 
     /**
      * @param string $eventName,
+     * @param string $dataType,
      * @param Customer $customer
-     * @param array $data
+     * @param mixed[]|AbstractModel $data
      * @param int|Store|null $store
      */
-    public function publish($eventName, $customer, $data = [], $store = null)
+    public function publish($eventName, $dataType, $customer, $data = [], $store = null)
     {
         $uri = $this->__getUri($customer);
         $arrayData = $this->__getRawData($data);
@@ -147,8 +169,11 @@ class EventPublisher extends AbstractHelper
         $body = json_encode([
             'event' => $eventName,
             'store' => $store->getData(),
-            'customer' => $customer->getData(),
-            'data' => $arrayData
+            'customer' => $this->__serializeCustomer($customer),
+            'data' => [
+                'type' => $dataType,
+                'data' => $arrayData
+            ]
         ]);
 
         if (!$this->isKustomerIntegrationEnabled($eventName, $store))
@@ -158,4 +183,5 @@ class EventPublisher extends AbstractHelper
 
         $this->__request($uri, $body, $store);
     }
+
 }
