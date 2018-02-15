@@ -13,6 +13,7 @@
                 </field>
                 <field id="api_key" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Kustomer API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
             </group>
             <group id="event" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">

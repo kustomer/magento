@@ -26,6 +26,6 @@ class CustomerRegisterSuccessObserver extends KustomerEventObserver
         }
 
         $dataType = 'customer';
-        $this->publish($eventName, $dataType, $customer);
+        $this->publish($dataType, [], $customer, null, $eventName);
     }
 }

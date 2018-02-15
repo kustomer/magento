@@ -30,13 +30,13 @@ class SalesOrderAfterPlaceObserver extends KustomerEventObserver
         }
 
 
-        if (!$this->__eventPublisher->isKustomerIntegrationEnabled($store))
+        if (!$this->__helperData->isKustomerIntegrationEnabled($store))
         {
             return;
         }
 
         $objectType = 'order';
-        $data = $order;
-        $this->publish($eventName, $objectType, $customer, $data, $store);
+        $data = $this->__helperData->normalizeOrder($order);
+        $this->publish($objectType, $data, $customer, $store, $eventName);
     }
 }
