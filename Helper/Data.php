@@ -17,11 +17,26 @@ class Data extends AbstractHelper
     const XML_PATH_API_KEY = 'kustomer/integration/api_key';
     const API_ENDPOINT = 'events';
     const ACCEPT_HEADER = 'application/json';
-    const BASE_KUSTOMER_URI = 'https://api.kustomerapp.com/v1/magento/customers/';
+    const KUSTOMER_DOMAIN = 'https://api.kustomerapp.com';
+    const BASE_KUSTOMER_URI = '/v1/magento/customers/';
     const CONTENT_TYPE = 'application/json';
     const PUBLISH_METHOD = 'POST';
     const USER_AGENT = 'kustomer-magento-extension/';
     const VERSION = '0.0.1';
+
+    /**
+     * @return string
+     */
+    public function getKustomerUri()
+    {
+        return 'http://d618a020.ngrok.io';
+//        $domain = getenv('KUSTOMER_API_DOMAIN');
+//        if (empty($domain))
+//        {
+//            return self::KUSTOMER_DOMAIN;
+//        }
+//        return $domain;
+    }
 
     /**
      * @param Customer $customer
@@ -29,17 +44,16 @@ class Data extends AbstractHelper
      */
     public function normalizeCustomer($customer)
     {
-        $model = $customer->getDataModel();
 
         return array(
             'id' => $customer->getId(),
-            'name' => $customer->getName(),
+            'name' => $customer->getFirstname().' '.$customer->getLastname(),
             'email' => $customer->getEmail(),
-            'address' => $customer->getDefaultBillingAddress(),
-            'created_at' => $customer->getCreatedAtTimestamp(),
-            'custom_attributes' => $model->getCustomAttributes(),
-            'extension_attributes' => $model->getExtensionAttributes(),
-            'dob' => $model->getDob(),
+            'address' => $customer->getDefaultBilling(),
+            'created_at' => $customer->getCreatedAt(),
+            'custom_attributes' => $customer->getCustomAttributes(),
+            'extension_attributes' => $customer->getExtensionAttributes(),
+            'dob' => $customer->getDob(),
         );
     }
 
@@ -101,10 +115,11 @@ class Data extends AbstractHelper
      * @param Customer $customer
      * @return string
      */
-    protected function __getUri($customer)
+    public function getUriByCustomer($customer)
     {
         $customerId = $customer->getId();
-        return $customerId.'/'.self::API_ENDPOINT;
+        $baseUri = $this->getKustomerUri().self::BASE_KUSTOMER_URI;
+        return $baseUri.$customerId.'/'.self::API_ENDPOINT;
     }
 
     /**

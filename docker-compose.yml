@@ -2,6 +2,8 @@ version: '3'
 services:
   magento:
     build: .
+    depends_on:
+      - db
     env_file: .env
     volumes:
       - ./:/var/www/html/app/code/Kustomer/KustomerIntegration

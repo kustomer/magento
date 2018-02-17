@@ -2,10 +2,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
-        <Kustomer_KustomerIntegration>
-            <configuration>
+        <kustomer>
+            <integration>
                 <api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
-            </configuration>
-        </Kustomer_KustomerIntegration>
+            </integration>
+        </kustomer>
     </default>
 </config>
