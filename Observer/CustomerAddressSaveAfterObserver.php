@@ -18,7 +18,7 @@ class CustomerAddressSaveAfterObserver extends KustomerEventObserver
         /**
          * @var Customer $customer
          */
-        $eventName = $observer->getEventName();
+        $eventName = $observer->getEvent()->getName();
         $customerAddress = $observer->getCustomerAddress();
         $customer = $customerAddress->getCustomer();
 

@@ -18,7 +18,7 @@ class CustomerRegisterSuccessObserver extends KustomerEventObserver
          * @var Customer $customer
          */
         $customer = $observer->getEvent()->getCustomer();
-        $eventName = $observer->getEventName();
+        $eventName = $observer->getEvent()->getName();
 
         if (empty($customer))
         {

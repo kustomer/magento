@@ -20,7 +20,7 @@ class SalesOrderAfterPlaceObserver extends KustomerEventObserver
          * @var Store $store
          */
         $order = $observer->getEvent()->getOrder();
-        $eventName = $observer->getEventName();
+        $eventName = $observer->getEvent()->getName();
         $customer = $order->getCustomer();
         $store = $order->getStore();
 

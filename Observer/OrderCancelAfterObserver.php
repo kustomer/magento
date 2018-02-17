@@ -19,7 +19,7 @@ class OrderCancelAfterObserver extends KustomerEventObserver
          * @var \Magento\Customer\Model\Customer $customer
          * @var \Magento\Store\Model\Store $store
          */
-        $eventName = $observer->getEventName();
+        $eventName = $observer->getEvent()->getName();
         $order = $observer->getEvent()->getOrder();
         $customer = $order->getCustomer();
         $store = $customer->getStore();
