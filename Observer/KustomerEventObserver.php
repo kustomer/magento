@@ -2,9 +2,11 @@
 
 namespace Kustomer\KustomerIntegration\Observer;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\HTTP\Client\Curl;
-use Psr\Log\LoggerInterface;
-use Magento\Customer\Model\Customer;
+use Magento\Customer\Model\Data\Customer;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Event\ObserverInterface;
@@ -67,6 +69,11 @@ abstract class KustomerEventObserver implements ObserverInterface
     protected $__storeRepository;
 
     /**
+     * @var CustomerRepositoryInterface
+     */
+    protected $__customerRepository;
+
+    /**
      * @var Curl
      */
     protected $__curl;
@@ -74,17 +81,32 @@ abstract class KustomerEventObserver implements ObserverInterface
     protected $logger;
 
     /**
+     * @param string|int $id
+     * @return CustomerInterface|null
+     */
+    protected function __getCustomerById($id)
+    {
+        $customer = null;
+        try {
+            $customer = $this->__customerRepository->getById($id);
+        } catch (LocalizedException $e) {
+            $this->logger->error('no customer exists by id '.$id, $e);
+        }
+        return $customer;
+    }
+
+    /**
      * @param string $eventName ,
      * @param string $dataType ,
      * @param mixed[] $data
-     * @param Customer $customer
+     * @param CustomerInterface $customer
      * @param int|Store|null $store
      */
     protected function __publish($eventName, $dataType, $data, $customer, $store = null)
     {
         $uri = $this->__helperData->getUriByCustomer($customer);
 
-        if (is_int($store) || empty($store))
+        if (is_int($store) || is_string($store) || empty($store))
         {
             $store_id = $customer->getStoreId();
             $store = $this->__storeRepository->getStore($store_id);
@@ -100,48 +122,62 @@ abstract class KustomerEventObserver implements ObserverInterface
             ]
         ]);
 
-        if (!$this->__helperData->isKustomerIntegrationEnabled($eventName, $store))
-        {
-            return;
-        }
-
         $this->__request($uri, $body, $store);
     }
 
     /**
      * KustomerEventObserver constructor.
      * @param Data $kustomerDataHelper
-     * @param StoreManagerInterface $storeManagerInterface
-     * @param Curl $curl
-     * @param LoggerInterface $logger
      */
     public function __construct(
-        Data $kustomerDataHelper,
-        StoreManagerInterface $storeManagerInterface,
-        Curl $curl,
-        LoggerInterface $logger
+        Data $kustomerDataHelper
     )
     {
-        $this->__storeRepository = $storeManagerInterface;
         $this->__helperData = $kustomerDataHelper;
-        $this->__curl = $curl;
-        $this->logger = $logger;
+        $this->__customerRepository = $this->__helperData->customerRepository;
+        $this->__storeRepository = $this->__helperData->storeManagerInterface;
+        $this->__curl = $this->__helperData->curl;
+        $this->logger = $this->__helperData->logger;
     }
 
     /**
      * @param string $dataType - The type of data you are submitting (i.e. "order")
      * @param array $data - The array of data to send to customer
-     * @param Customer $customer - The customer object from Magento
+     * @param Customer|CustomerInterface|int|string $customer - The customer object from Magento
      * @param Store|int|null $store - The store ID or store object the event was emitted from
      * @param string $eventName - The name of the event being emitted
      */
     public function publish($dataType, $data, $customer, $store = null, $eventName = null)
     {
+        if (!$this->__helperData->isKustomerIntegrationEnabled($eventName, $store))
+        {
+            $this->logger->debug('kustomer: event '.$eventName.' disabled for scope. not publishing...');
+            return;
+        }
+
+        $this->logger->debug('kustomer: processing event '.$eventName.'...');
+        if (is_string($customer) || is_int($customer))
+        {
+            $customer = $this->__getCustomerById($customer);
+        }
+
+        if ($customer instanceof Customer)
+        {
+            $customer = $this->__getCustomerById($customer->getId());
+        }
+
+        if (!$customer instanceof CustomerInterface)
+        {
+            $this->logger->error('no customer provided for event '.$eventName);
+            return;
+        }
+
         if ($dataType === 'customer' && empty($data))
         {
             $data = $this->__helperData->normalizeCustomer($customer);
         }
 
-        $this->__publish($eventName, $dataType, $data, $customer, $store);
+        $result = $this->__publish($eventName, $dataType, $data, $customer, $store);
+        $this->logger->debug('kustomer: processing for event '.$eventName.' complete. success: '.$result);
     }
 }

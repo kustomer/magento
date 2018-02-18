@@ -2,13 +2,16 @@
 
 namespace Kustomer\KustomerIntegration\Helper;
 
-use Magento\Sales\Model\Order;
-use Magento\Customer\Model\Customer;
+use Magento\Framework\App\Helper\Context;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\Model\AbstractModel;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\ScopeInterface;
-
+use Magento\Framework\HTTP\Client\Curl;
+use Psr\Log\LoggerInterface;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Data extends AbstractHelper
 {
@@ -24,22 +27,41 @@ class Data extends AbstractHelper
     const USER_AGENT = 'kustomer-magento-extension/';
     const VERSION = '0.0.1';
 
+    public $customerRepository;
+    public $storeManagerInterface;
+    public $curl;
+    public $logger;
+
+    public function __construct(
+        Context $context,
+        StoreManagerInterface $storeManagerInterface,
+        CustomerRepositoryInterface $customerRepository,
+        Curl $curl,
+        LoggerInterface $logger
+    )
+    {
+        parent::__construct($context);
+        $this->storeManagerInterface = $storeManagerInterface;
+        $this->customerRepository = $customerRepository;
+        $this->curl = $curl;
+        $this->logger = $logger;
+    }
+
     /**
      * @return string
      */
     public function getKustomerUri()
     {
-        return 'http://d618a020.ngrok.io';
-//        $domain = getenv('KUSTOMER_API_DOMAIN');
-//        if (empty($domain))
-//        {
-//            return self::KUSTOMER_DOMAIN;
-//        }
-//        return $domain;
+        $domain = getenv('KUSTOMER_API_DOMAIN');
+        if (empty($domain))
+        {
+            return self::KUSTOMER_DOMAIN;
+        }
+        return $domain;
     }
 
     /**
-     * @param Customer $customer
+     * @param CustomerInterface $customer
      * @return array
      */
     public function normalizeCustomer($customer)
@@ -58,26 +80,47 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param Order $order
+     * @param OrderInterface $order
      * @return array
      */
     public function normalizeOrder($order)
     {
         return array(
-            'id' => $order->getId(),
-            'items' => $order->getAllItems(),
+            'id' => $order->getEntityId(),
+            'items' => $this->normalizeOrderItems($order->getItems()),
             'state' => $order->getState(),
             'status' => $order->getStatus(),
-            'shipping_method' => $order->getShippingMethod(),
             'currency_code' => $order->getOrderCurrencyCode(),
+            'shipping_amount' => $order->getShippingAmount(),
             'subtotal' => $order->getSubtotal(),
             'total_due' => $order->getTotalDue(),
             'total_discount' => $order->getDiscountAmount(),
             'total_paid' => $order->getTotalPaid(),
             'total_refunded' => $order->getTotalRefunded(),
-            'custom_attributes' => $order->getCustomAttributes(),
             'extension_attributes' => $order->getExtensionAttributes()
         );
+    }
+
+    /**
+     * @param \Magento\Sales\Api\Data\OrderItemInterface[] $items
+     * @return mixed[]
+     */
+    public function normalizeOrderItems($items)
+    {
+        $normalized = array();
+        foreach ($items as $item)
+        {
+            array_push($normalized, array(
+                'name' => $item->getName(),
+                'sku' => $item->getSku(),
+                'product_id' => $item->getProductId(),
+                'quantity' => $item->getQtyOrdered(),
+                'price' => $item->getPrice(),
+                'discount' => $item->getDiscountAmount(),
+                'total' => $item->getRowTotal()
+            ));
+        }
+        return $normalized;
     }
 
     /**
@@ -94,15 +137,6 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param AbstractModel $obj
-     * @return array
-     */
-    public function toPlainArray($obj)
-    {
-        return $obj->toArray();
-    }
-
-    /**
      * @param Store|null $store
      * @return string
      */
@@ -112,7 +146,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param Customer $customer
+     * @param CustomerInterface $customer
      * @return string
      */
     public function getUriByCustomer($customer)

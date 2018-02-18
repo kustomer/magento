@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="sales_order_place_after">
-        <observer name="kustomer_order_create" instance="Kustomer\KustomerIntegration\Observer\SalesOrderAfterPlaceObserver" />
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="kustomer_order_create" instance="Kustomer\KustomerIntegration\Observer\CheckoutSuccessActionObserver" />
     </event>
     <event name="customer_register_success">
         <observer name="kustomer_customer_create" instance="Kustomer\KustomerIntegration\Observer\CustomerRegisterSuccessObserver" />
     </event>
-    <event name="customer_address_save_after">
-        <observer name="kustomer_customer_address_update" instance="Kustomer\KustomerIntegration\Observer\CustomerAddressSaveAfterObserver" />
+    <event name="customer_save_after_data_object">
+        <observer name="kustomer_customer_save_after_data_object" instance="Kustomer\KustomerIntegration\Observer\CustomerSaveAfterDataObjectObserver" />
     </event>
     <event name="order_cancel_after">
         <observer name="kustomer_order_canceled" instance="Kustomer\KustomerIntegration\Observer\OrderCancelAfterObserver" />

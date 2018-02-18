@@ -2,9 +2,7 @@
 
 namespace Kustomer\KustomerIntegration\Observer;
 
-use Magento\Customer\Model\Customer;
 use Magento\Framework\Event\Observer as EventObserver;
-use Magento\Store\Model\Store;
 
 class CustomerRegisterSuccessObserver extends KustomerEventObserver
 {
@@ -14,8 +12,7 @@ class CustomerRegisterSuccessObserver extends KustomerEventObserver
     public function execute(EventObserver $observer)
     {
         /**
-         * @var Store $store
-         * @var Customer $customer
+         * @var \Magento\Customer\Api\Data\CustomerInterface $customer
          */
         $customer = $observer->getEvent()->getCustomer();
         $eventName = $observer->getEvent()->getName();

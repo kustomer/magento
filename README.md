@@ -46,8 +46,8 @@ class MySubscriptionObserver extends KustomerEventObserver
      */
     public function execute(EventObserver $observer)
     {
-        $subscription = $observer->getEvent()->getOrder();
-        $customer = $subscription->getCustomer();
+        $subscription = $observer->getEvent()->getSubscription();
+        $customer = $subscription->getCustomerId();
 
         $type = 'subscription';
         $data = array(
@@ -60,7 +60,7 @@ class MySubscriptionObserver extends KustomerEventObserver
     }
 }
 ```
-Note that the `KustomerEventObserver.publish()` method requires a `$type` string, an array of `$data` (this is will be your object in Kustomer) and a `customer` object.
+Note that the `KustomerEventObserver.publish()` method requires a `$type` string, an array of `$data` (this is will be your object in Kustomer) and a `$customer` variable that is either a customer ID or an instance of `CustomerInterface`.
 
 We also recommend you explicitly select which fields you send to Kustomer. This will avoid inadvertently sharing information you may not want to share with Kustomer, such as passwords.
 
@@ -76,3 +76,24 @@ Once your observer is ready, you need to register it in your module's `etc/event
 ```
 
 Subscription objects will automatically be ingested by Kustomer and associated with your customer as Kustom Objects belonging to a dynamically-generated Klass.
+
+## Customer Only Events
+If you just want to send the Customer object, you can assign `$type` a value of `'customer'` and pass an empty array as `$data`:
+
+```php
+<?php
+class MySubscriptionObserver extends KustomerEventObserver
+{
+    /**
+     * @param EventObserver $observer
+     */
+    public function execute(EventObserver $observer)
+    {
+        $customer = $observer->getEvent()->getCustomer();
+
+        $type = 'customer';
+        $data = [];
+        $this->publish($type, $data, $customer);
+    }
+}
+```
