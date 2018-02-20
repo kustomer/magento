@@ -2,7 +2,8 @@
 
 namespace Kustomer\KustomerIntegration\Observer;
 
-use Kustomer\KustomerIntegration\Observer\KustomerEventObserver;
+use Kustomer\KustomerIntegration\Helper\Data;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Framework\Event\Observer as EventObserver;
 
 /**
@@ -11,16 +12,36 @@ use Magento\Framework\Event\Observer as EventObserver;
 class OrderCancelAfterObserver extends KustomerEventObserver
 {
     /**
+     * @var OrderRepositoryInterface
+     */
+    protected $__orderRepository;
+
+    /**
+     * OrderCancelAfterObserver constructor.
+     * @param Data $kustomerDataHelper
+     * @param OrderRepositoryInterface $orderRepository
+     */
+    public function __construct(
+        Data $kustomerDataHelper,
+        OrderRepositoryInterface $orderRepository
+    )
+    {
+        parent::__construct($kustomerDataHelper);
+        $this->__orderRepository = $orderRepository;
+    }
+
+    /**
      * @param EventObserver $observer
      */
     public function execute(EventObserver $observer)
     {
         /**
          * @var string $eventName
-         * @var \Magento\Sales\Api\Data\OrderInterface $order
+         * @var \Magento\Sales\Model\Order $orderModel
          */
         $eventName = $observer->getEvent()->getName();
-        $order = $observer->getEvent()->getOrder();
+        $orderModel = $observer->getEvent()->getData()['order'];
+        $order = $this->__orderRepository->get($orderModel->getId());
         $customer = $order->getCustomerId();
         $store = $order->getStoreId();
 

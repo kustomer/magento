@@ -3,16 +3,13 @@
 namespace Kustomer\KustomerIntegration\Observer;
 
 use Kustomer\KustomerIntegration\Helper\Data;
-use Magento\Customer\Model\Customer;
 use Magento\Framework\Event\Observer as EventObserver;
-use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Store\Model\Store;
 use Magento\Sales\Api\OrderRepositoryInterface;
 
 class CheckoutSuccessActionObserver extends KustomerEventObserver
 {
     /**
-     * @var OrderRepositoryInterface
+     * @var \Magento\Sales\Api\OrderRepositoryInterface
      */
     protected $__orderRepository;
 
@@ -31,9 +28,9 @@ class CheckoutSuccessActionObserver extends KustomerEventObserver
     public function execute(EventObserver $observer)
     {
         /**
-         * @var OrderInterface $order
-         * @var Customer $customer
-         * @var Store $store
+         * @var \Magento\Sales\Api\Data\OrderInterface $order
+         * @var \Magento\Customer\Model\Customer $customer
+         * @var \Magento\Store\Model\Store $store
          */
         $orderId = $observer->getEvent()->getData()['order_ids'][0];
         $order = $this->__orderRepository->get($orderId);
