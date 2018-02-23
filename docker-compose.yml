@@ -12,5 +12,7 @@ services:
   db:
     image: mysql
     env_file: .env
+    ports:
+      - "3306:3306"
     volumes:
       - ~/data/mysql:/var/lib/mysql

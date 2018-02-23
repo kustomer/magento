@@ -2,8 +2,9 @@
 
 namespace Kustomer\KustomerIntegration\Observer;
 
+use Kustomer\KustomerIntegration\Model\Event;
+use Kustomer\KustomerIntegration\Model\EventFactory;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\HTTP\Client\Curl;
 use Magento\Customer\Model\Data\Customer;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -18,45 +19,6 @@ use Kustomer\KustomerIntegration\Helper\Data;
  */
 abstract class KustomerEventObserver implements ObserverInterface
 {
-
-    /**
-     * @param string $uri
-     * @param string|null $body
-     * @param Store|null $store
-     * @return boolean
-     */
-    protected function __request($uri, $body = null, $store = null)
-    {
-        $authToken = $this->__helperData->getKustomerApiKey($store);
-        $headers = array(
-            'Authorization' => 'Bearer '.$authToken,
-            'User-Agent' => $this->__helperData::USER_AGENT.$this->__helperData::VERSION,
-            'Accept' => $this->__helperData::ACCEPT_HEADER,
-            'Content-Type' => $this->__helperData::CONTENT_TYPE,
-        );
-
-        $this->logger->debug($uri.'\n\t'.implode('\n\t', $headers).'\n'.$body);
-
-        $this->__curl->setHeaders($headers);
-        try {
-            $this->__curl->post($uri, $body);
-        } catch (\Exception $e) {
-            $this->logger->error('Failed to connect to Kustomer API', $e);
-        }
-
-        $statusCode = $this->__curl->getStatus();
-
-        /**
-         * @todo Some kind of retry logic or error logging
-         */
-        if ($statusCode >= 400)
-        {
-            $this->logger->error('Failed to connect to Kustomer API');
-            return false;
-        }
-
-        return true;
-    }
 
     /**
      * @var Data
@@ -74,9 +36,9 @@ abstract class KustomerEventObserver implements ObserverInterface
     protected $__customerRepository;
 
     /**
-     * @var Curl
+     * @var EventFactory
      */
-    protected $__curl;
+    protected $eventFactory;
 
     protected $logger;
 
@@ -122,21 +84,25 @@ abstract class KustomerEventObserver implements ObserverInterface
             ]
         ]);
 
-        $this->__request($uri, $body, $store);
+        /** @var Event $event */
+        $event = $this->eventFactory->create();
+        $event->create($uri, $body, $store->getId());
     }
 
     /**
      * KustomerEventObserver constructor.
      * @param Data $kustomerDataHelper
+     * @param Event $eventModel
      */
     public function __construct(
-        Data $kustomerDataHelper
+        Data $kustomerDataHelper,
+        EventFactory $eventFactory
     )
     {
         $this->__helperData = $kustomerDataHelper;
         $this->__customerRepository = $this->__helperData->customerRepository;
         $this->__storeRepository = $this->__helperData->storeManagerInterface;
-        $this->__curl = $this->__helperData->curl;
+        $this->eventFactory = $eventFactory;
         $this->logger = $this->__helperData->logger;
     }
 

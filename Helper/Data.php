@@ -182,4 +182,49 @@ class Data extends AbstractHelper
         $isEventEnabled = $this->__isEventEnabled($eventName, $store);
         return $hasApiKey && $isKustomerEnabled && $isEventEnabled;
     }
+
+    /**
+     * @param string $uri
+     * @param string|null $body
+     * @param Store|null $store
+     * @return array
+     */
+    public function request($uri, $body = null, $store = null)
+    {
+        $authToken = $this->getKustomerApiKey($store);
+        $headers = array(
+            'Authorization' => 'Bearer '.$authToken,
+            'User-Agent' => self::USER_AGENT.self::VERSION,
+            'Accept' => self::ACCEPT_HEADER,
+            'Content-Type' => self::CONTENT_TYPE,
+        );
+
+        $this->logger->debug($uri.'\n\t'.$body);
+
+        $this->curl->setHeaders($headers);
+        try {
+            $this->curl->post($uri, $body);
+        } catch (\Exception $e) {
+            return [
+              'success' => false,
+              'error' => $e->getCode().': '.$e->getMessage()
+            ];
+        }
+
+        $statusCode = $this->curl->getStatus();
+        $bodyMessage = $this->curl->getBody();
+
+        if ($statusCode >= 400)
+        {
+            return [
+                'success' => false,
+                'error' => $statusCode.': '.$bodyMessage
+            ];
+        }
+
+        return [
+            'success' => true,
+            'error' => null
+        ];
+    }
 }
