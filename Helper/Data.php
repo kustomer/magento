@@ -25,7 +25,7 @@ class Data extends AbstractHelper
     const CONTENT_TYPE = 'application/json';
     const PUBLISH_METHOD = 'POST';
     const USER_AGENT = 'kustomer-magento-extension/';
-    const VERSION = '0.0.1';
+    const VERSION = '1.0.0';
 
     public $customerRepository;
     public $storeManagerInterface;
@@ -198,8 +198,6 @@ class Data extends AbstractHelper
             'Accept' => self::ACCEPT_HEADER,
             'Content-Type' => self::CONTENT_TYPE,
         );
-
-        $this->logger->debug($uri.'\n\t'.$body);
 
         $this->curl->setHeaders($headers);
         try {

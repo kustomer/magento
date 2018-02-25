@@ -47,31 +47,38 @@ class Event extends \Magento\Framework\Model\AbstractModel
      */
     public function clean()
     {
-        $this->_logger->debug('kustomer:event:clean:start');
+        $this->_logger->debug('kustomer:event:clean:start', $this->getData());
+        $collection = null;
         try {
             $collection = $this->getResourceCollection();
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->_logger->critical($e);
+        }
+
+        if ($collection === null) {
+            $this->_logger->debug('kustomer:event:clean:abort no collection found');
             return $this;
         }
+
         $collection
             ->addFieldToFilter(
                 ['is_sent', 'send_count'],
                 [
-                    ['eq' => 0],
-                    ['gte' => $this->_resource->getMaxSendCount()]
+                    ['eq' => 1],
+                    ['gteq' => $this->getResource()->getMaxSendCount()]
                 ]
             );
         $items = $collection->getItems();
         $deleted = 0;
 
         /**
-         * @var Event $event
+         * @var Event $data
          */
-        foreach ($items as $event)
+        foreach ($items as $data)
         {
-            $this->_resource->clean($event);
-            if ($event->isDeleted())
+            $this->_logger->debug('kustomer:event:clean:item id: '.$data->getId(), $data->getData());
+            $this->getResource()->clean($data);
+            if ($data->isDeleted())
             {
                 $deleted += 1;
             }
@@ -99,22 +106,24 @@ class Event extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * @return $this|void
+     * @return $this
      */
     public function delete()
     {
-        $this->_logger->debug('kustomer:event:delete', $this->getData());
+        $this->_logger->debug('kustomer:event:delete. id: '.$this->getData('event_id'));
 
         try {
-            $this->_resource->delete($this);
+            $this->getResource()->delete($this);
         } catch (\Exception $e) {
             $this->_logger->critical($e);
         }
+
+        return $this;
     }
 
     public function send()
     {
-        $this->_logger->debug('kustomer:event:send:start');
+        $this->_logger->debug('kustomer:event:send:start', $this->getData());
         $collection = null;
 
         try {
@@ -130,29 +139,27 @@ class Event extends \Magento\Framework\Model\AbstractModel
 
         $collection
             ->addFieldToFilter(
-                ['is_sent', 'send_count'],
-                [
-                    ['eq' => 0],
-                    ['lte' => $this->getResource()->getMaxSendCount()]
-                ]
+                'is_sent',
+                ['eq' => 0]
+            )->addFieldToFilter(
+                'send_count',
+                ['lteq' => $this->getResource()->getMaxSendCount()]
             );
         $items = $collection->getItems();
         $sent = 0;
 
         /**
-         * @var Event $event
+         * @var Event $data
          */
         foreach ($items as $data)
         {
-            $this->_logger->debug('kustomer:event:send:item id: '.$data->getData('event_id'));
+            $this->_logger->debug('kustomer:event:send:item id: '.$data->getId());
 
-            $this->setData($data->getData());
-            $this->getResource()->send($this);
+            $this->getResource()->send($data);
             if ($this->getData('is_sent'))
             {
                 $sent += 1;
             }
-            $this->unsetData();
         }
 
         $this->_logger->debug('kustomer:event:send:done', ['send_count' => $sent]);
@@ -160,11 +167,11 @@ class Event extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * @return $this|void
+     * @return $this
      */
     public function save()
     {
-        $this->_logger->debug('kustomer:event:save', $this->getData());
+        $this->_logger->debug('kustomer:event:save id: '.$this->getId());
         $resource = $this->getResource();
 
         try {
@@ -172,5 +179,7 @@ class Event extends \Magento\Framework\Model\AbstractModel
         } catch (\Exception $e) {
             $this->_logger->critical($e);
         }
+
+        return $this;
     }
 }

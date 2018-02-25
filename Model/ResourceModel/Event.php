@@ -80,8 +80,8 @@ class Event extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $eventData = $event->getData();
         $expiry = (int)$this->date->gmtDate('U', $eventData['last_sent_at']) + $this->hoursToSeconds(self::EVENT_EXPIRATION_ERROR_HOURS);
         $isTimeExpired = time() > $expiry;
-        $isBelowSendLimit = $eventData['send_count'] >= self::MAX_SEND_COUNT;
-        return !$eventData['is_sent'] && $isTimeExpired && $isBelowSendLimit;
+        $isAtSendLimit = $eventData['send_count'] >= self::MAX_SEND_COUNT;
+        return !$eventData['is_sent'] && $isTimeExpired && $isAtSendLimit;
     }
 
     /**
@@ -100,11 +100,16 @@ class Event extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     protected function isSendable(\Kustomer\KustomerIntegration\Model\Event $event)
     {
         $eventData = $event->getData();
-        $sendCount = $eventData['send_count'];
+        $sendCount = (int)$eventData['send_count'];
+
+        if (!$sendCount) {
+            return true;
+        }
+
         $lastSentAt = $eventData['last_sent_at'];
-        $isSent = $eventData['is_sent'];
+        $isSent = $eventData['is_sent'] === 1;
         $sentStamp = (int)$this->date->gmtDate('U', $lastSentAt);
-        $isSendTime = !$lastSentAt || $sentStamp + ($sendCount**2) > time();
+        $isSendTime = $sentStamp + (($sendCount*6)**2) < time();
         $isBelowLimit = $sendCount < self::MAX_SEND_COUNT;
 
         return !$isSent && $isSendTime && $isBelowLimit;
@@ -118,11 +123,12 @@ class Event extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     protected function sendEventError(\Kustomer\KustomerIntegration\Model\Event $event, string $errorMessage)
     {
         $eventData = $event->getData();
-        $eventData['last_sent_at'] = $this->date->gmtDate('c', time());
-        $eventData['sendCount'] += 1 || 1;
-        $eventData['error_message'] = $errorMessage;
+        $lastSentAt = $this->date->gmtDate('c', time());
+        $sendCount = (int)$eventData['send_count'] + 1;
 
-        $event->setData($eventData);
+        $event->setData('last_sent_at', $lastSentAt);
+        $event->setData('send_count', $sendCount);
+        $event->setData('error_message', $errorMessage);
         $event->save();
         return $event;
     }
@@ -137,7 +143,8 @@ class Event extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $lastSentAt = $this->date->gmtDate('c', time());
         $eventData['last_sent_at'] = $lastSentAt;
         $eventData['is_sent'] = 1;
-        $eventData['send_count'] += 1 || 1;
+        $eventData['send_count'] = (int)$eventData['send_count'] + 1;
+
         $event->setData($eventData);
         $event->save();
         return $event;

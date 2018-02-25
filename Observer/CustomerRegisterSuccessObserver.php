@@ -16,13 +16,20 @@ class CustomerRegisterSuccessObserver extends KustomerEventObserver
          */
         $customer = $observer->getEvent()->getCustomer();
         $eventName = $observer->getEvent()->getName();
+        $storeId = $customer->getStoreId();
 
         if (empty($customer))
         {
             return;
         }
 
+        // If customer save handler is enabled do not publish duplicate data
+        if ($this->__helperData->isKustomerIntegrationEnabled('customer_save_after_data_object', $storeId))
+        {
+            return;
+        }
+
         $dataType = 'customer';
-        $this->publish($dataType, [], $customer, null, $eventName);
+        $this->publish($dataType, [], $customer, $storeId, $eventName);
     }
 }
