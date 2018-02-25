@@ -156,7 +156,7 @@ class Event extends \Magento\Framework\Model\AbstractModel
             $this->_logger->debug('kustomer:event:send:item id: '.$data->getId());
 
             $this->getResource()->send($data);
-            if ($this->getData('is_sent'))
+            if ($data->getData('is_sent'))
             {
                 $sent += 1;
             }
