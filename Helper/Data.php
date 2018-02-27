@@ -25,7 +25,7 @@ class Data extends AbstractHelper
     const CONTENT_TYPE = 'application/json';
     const PUBLISH_METHOD = 'POST';
     const USER_AGENT = 'kustomer-magento-extension/';
-    const VERSION = '0.0.1';
+    const VERSION = '1.0.0';
 
     public $customerRepository;
     public $storeManagerInterface;
@@ -61,6 +61,38 @@ class Data extends AbstractHelper
     }
 
     /**
+     * @param \Magento\Customer\Api\Data\AddressInterface[] $addresses
+     * @return mixed[]
+     */
+    public function normalizeAddresses($addresses)
+    {
+        $normal = [];
+
+        if (empty($addresses)) {
+            return $normal;
+        }
+
+        foreach ($addresses as $address) {
+            $street = $address->getStreet();
+
+            if (is_array($street)) {
+                $street = implode(' ', $street);
+            }
+
+            $n = array(
+                'street' => $street,
+                'city' => $address->getCity(),
+                'state' => $address->getRegion()->getRegion(),
+                'zip' => $address->getPostcode(),
+                'country' => $address->getCountryId()
+            );
+            array_push($normal, $n);
+        }
+
+        return $normal;
+    }
+
+    /**
      * @param CustomerInterface $customer
      * @return array
      */
@@ -71,7 +103,8 @@ class Data extends AbstractHelper
             'id' => $customer->getId(),
             'name' => $customer->getFirstname().' '.$customer->getLastname(),
             'email' => $customer->getEmail(),
-            'address' => $customer->getDefaultBilling(),
+            'addresses' => $this->normalizeAddresses($customer->getAddresses()),
+            'phones' => $this->normalizePhonesFromCustomer($customer),
             'created_at' => $customer->getCreatedAt(),
             'custom_attributes' => $customer->getCustomAttributes(),
             'extension_attributes' => $customer->getExtensionAttributes(),
@@ -99,6 +132,29 @@ class Data extends AbstractHelper
             'total_refunded' => $order->getTotalRefunded(),
             'extension_attributes' => $order->getExtensionAttributes()
         );
+    }
+
+    /**
+     * @param CustomerInterface $customer
+     * @return string[]
+     */
+    public function normalizePhonesFromCustomer(CustomerInterface $customer)
+    {
+        $phones = [];
+        $addresses = $customer->getAddresses();
+
+        if (empty($addresses)) {
+            return $phones;
+        }
+
+        foreach ($addresses as $address) {
+            $phone = $address->getTelephone();
+            if ($phone) {
+                array_push($phones, $phone);
+            }
+        }
+
+        return $phones;
     }
 
     /**
@@ -181,5 +237,48 @@ class Data extends AbstractHelper
         $isKustomerEnabled = $this->scopeConfig->isSetFlag(self::XML_PATH_ENABLED, ScopeInterface::SCOPE_STORE, $store);
         $isEventEnabled = $this->__isEventEnabled($eventName, $store);
         return $hasApiKey && $isKustomerEnabled && $isEventEnabled;
+    }
+
+    /**
+     * @param string $uri
+     * @param string|null $body
+     * @param Store|null $store
+     * @return array
+     */
+    public function request($uri, $body = null, $store = null)
+    {
+        $authToken = $this->getKustomerApiKey($store);
+        $headers = array(
+            'Authorization' => 'Bearer '.$authToken,
+            'User-Agent' => self::USER_AGENT.self::VERSION,
+            'Accept' => self::ACCEPT_HEADER,
+            'Content-Type' => self::CONTENT_TYPE,
+        );
+
+        $this->curl->setHeaders($headers);
+        try {
+            $this->curl->post($uri, $body);
+        } catch (\Exception $e) {
+            return [
+              'success' => false,
+              'error' => $e->getCode().': '.$e->getMessage()
+            ];
+        }
+
+        $statusCode = $this->curl->getStatus();
+        $bodyMessage = $this->curl->getBody();
+
+        if ($statusCode >= 400)
+        {
+            return [
+                'success' => false,
+                'error' => $statusCode.': '.$bodyMessage
+            ];
+        }
+
+        return [
+            'success' => true,
+            'error' => null
+        ];
     }
 }
