@@ -61,6 +61,32 @@ class Data extends AbstractHelper
     }
 
     /**
+     * @param \Magento\Customer\Api\Data\AddressInterface[] $addresses
+     * @return mixed[]
+     */
+    public function normalizeAddresses($addresses)
+    {
+        $normal = [];
+
+        if (empty($addresses)) {
+            return $normal;
+        }
+
+        foreach ($addresses as $address) {
+            $n = array(
+                'street' => $address->getStreet(),
+                'city' => $address->getCity(),
+                'state' => $address->getRegion()->getRegion(),
+                'zip' => $address->getPostcode(),
+                'country' => $address->getCountryId()
+            );
+            array_push($normal, $n);
+        }
+
+        return $normal;
+    }
+
+    /**
      * @param CustomerInterface $customer
      * @return array
      */
@@ -71,7 +97,8 @@ class Data extends AbstractHelper
             'id' => $customer->getId(),
             'name' => $customer->getFirstname().' '.$customer->getLastname(),
             'email' => $customer->getEmail(),
-            'address' => $customer->getDefaultBilling(),
+            'addresses' => $this->normalizeAddresses($customer->getAddresses()),
+            'phones' => $this->normalizePhonesFromCustomer($customer),
             'created_at' => $customer->getCreatedAt(),
             'custom_attributes' => $customer->getCustomAttributes(),
             'extension_attributes' => $customer->getExtensionAttributes(),
@@ -99,6 +126,29 @@ class Data extends AbstractHelper
             'total_refunded' => $order->getTotalRefunded(),
             'extension_attributes' => $order->getExtensionAttributes()
         );
+    }
+
+    /**
+     * @param CustomerInterface $customer
+     * @return string[]
+     */
+    public function normalizePhonesFromCustomer(CustomerInterface $customer)
+    {
+        $phones = [];
+        $addresses = $customer->getAddresses();
+
+        if (empty($addresses)) {
+            return $phones;
+        }
+
+        foreach ($addresses as $address) {
+            $phone = $address->getTelephone();
+            if ($phone) {
+                array_push($phones, $phone);
+            }
+        }
+
+        return $phones;
     }
 
     /**
