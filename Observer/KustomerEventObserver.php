@@ -92,7 +92,7 @@ abstract class KustomerEventObserver implements ObserverInterface
     /**
      * KustomerEventObserver constructor.
      * @param Data $kustomerDataHelper
-     * @param Event $eventModel
+     * @param EventFactory $eventFactory
      */
     public function __construct(
         Data $kustomerDataHelper,

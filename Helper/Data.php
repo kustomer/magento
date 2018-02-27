@@ -73,8 +73,14 @@ class Data extends AbstractHelper
         }
 
         foreach ($addresses as $address) {
+            $street = $address->getStreet();
+
+            if (is_array($street)) {
+                $street = implode(' ', $street);
+            }
+
             $n = array(
-                'street' => $address->getStreet(),
+                'street' => $street,
                 'city' => $address->getCity(),
                 'state' => $address->getRegion()->getRegion(),
                 'zip' => $address->getPostcode(),

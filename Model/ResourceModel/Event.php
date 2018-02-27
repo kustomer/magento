@@ -144,6 +144,7 @@ class Event extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $eventData['last_sent_at'] = $lastSentAt;
         $eventData['is_sent'] = 1;
         $eventData['send_count'] = (int)$eventData['send_count'] + 1;
+        $eventData['error_message'] = null;
 
         $event->setData($eventData);
         $event->save();

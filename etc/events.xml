@@ -9,6 +9,9 @@
     <event name="customer_save_after_data_object">
         <observer name="kustomer_customer_save_after_data_object" instance="Kustomer\KustomerIntegration\Observer\CustomerSaveAfterDataObjectObserver" />
     </event>
+    <event name="customer_address_save_after">
+        <observer name="kustomer_customer_address_save_after" instance="Kustomer\KustomerIntegration\Observer\CustomerAddressSaveAfterObserver" />
+    </event>
     <event name="order_cancel_after">
         <observer name="kustomer_order_canceled" instance="Kustomer\KustomerIntegration\Observer\OrderCancelAfterObserver" />
     </event>
