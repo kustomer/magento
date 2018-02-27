@@ -79,9 +79,6 @@ class InstallSchema implements InstallSchemaInterface
         )->addIndex(
             $installer->getIdxName('kustomer_event_is_sent_last_sent_at', ['is_sent', 'send_count']),
             ['is_sent', 'send_count']
-        )->addIndex(
-            $installer->getIdxName('kustomer_event_last_sent_at_send_count_is_sent', ['last_sent_at', 'send_count', 'is_sent']),
-            ['is_sent', 'send_count']
         )->addForeignKey(
             $installer->getFkName('kustomer_event', 'store_id', 'store', 'store_id'),
             'store_id',

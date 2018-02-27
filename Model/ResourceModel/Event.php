@@ -157,7 +157,7 @@ class Event extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     protected function _send(\Kustomer\KustomerIntegration\Model\Event $event)
     {
         $eventData = $event->getData();
-        $result = $this->dataHelper->request($eventData['uri'], $event['body'], $event['store_id']);
+        $result = $this->dataHelper->request($eventData['uri'], $eventData['body'], $eventData['store_id']);
         if ($result['success'])
         {
             return $this->sendEventSuccess($event);
