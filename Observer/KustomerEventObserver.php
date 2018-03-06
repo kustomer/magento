@@ -21,6 +21,11 @@ abstract class KustomerEventObserver implements ObserverInterface
 {
 
     /**
+     * @var bool
+     */
+    protected $isBuiltIn = false;
+
+    /**
      * @var Data
      */
     protected $__helperData;
@@ -115,7 +120,7 @@ abstract class KustomerEventObserver implements ObserverInterface
      */
     public function publish($dataType, $data, $customer, $store = null, $eventName = null)
     {
-        if (!$this->__helperData->isKustomerIntegrationEnabled($eventName, $store))
+        if (!$this->__helperData->isKustomerIntegrationEnabled($eventName, $store) && $this->isBuiltIn === true)
         {
             $this->logger->debug('kustomer: event '.$eventName.' disabled for scope. not publishing...');
             return;
