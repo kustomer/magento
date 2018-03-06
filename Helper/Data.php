@@ -106,6 +106,7 @@ class Data extends AbstractHelper
             'addresses' => $this->normalizeAddresses($customer->getAddresses()),
             'phones' => $this->normalizePhonesFromCustomer($customer),
             'created_at' => $customer->getCreatedAt(),
+            'updated_at' => $customer->getUpdatedAt(),
             'custom_attributes' => $customer->getCustomAttributes(),
             'extension_attributes' => $customer->getExtensionAttributes(),
             'dob' => $customer->getDob(),

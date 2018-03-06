@@ -1,9 +1,6 @@
 # Kustomer Extension for Magento 2.x
 This extension allows publication of Magento events to Kustomer. It provides a `KustomerEventObserver` class that you can extend to publish events to your Kustomer account.
 
-## Development Software
-Note that this extension is still under active development and should not be considered suitable for production Magento stores.
-
 ## Installation
 1. Place the contents of this repo into the following path relative to your store's root installation folder `app/code/Kustomer/KustomerIntegration`
 2. In Magento admin disable cache by going to `System>>Cache Management`
