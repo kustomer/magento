@@ -5,6 +5,7 @@ namespace Kustomer\KustomerIntegration\Helper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Api\Data\RegionInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\ScopeInterface;
@@ -79,13 +80,21 @@ class Data extends AbstractHelper
                 $street = implode(' ', $street);
             }
 
+            $region = $address->getRegion();
+
             $n = array(
                 'street' => $street,
                 'city' => $address->getCity(),
-                'state' => $address->getRegion()->getRegion(),
                 'zip' => $address->getPostcode(),
                 'country' => $address->getCountryId()
             );
+
+            if ($region instanceof RegionInterface) {
+                $n['state'] = $region->getRegion();
+            } else if (is_string($region)) {
+                $n['state'] = $region;
+            }
+
             array_push($normal, $n);
         }
 
