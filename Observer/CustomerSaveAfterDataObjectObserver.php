@@ -10,6 +10,11 @@ use Magento\Framework\Event\Observer as EventObserver;
 class CustomerSaveAfterDataObjectObserver extends KustomerEventObserver
 {
     /**
+     * @var bool
+     */
+    protected $isBuiltIn = true;
+
+    /**
      * @param EventObserver $observer
      */
     public function execute(EventObserver $observer)

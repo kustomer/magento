@@ -9,6 +9,12 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 class CheckoutSuccessActionObserver extends KustomerEventObserver
 {
     /**
+     * Tells the publisher to check event is enabled in store config before attempting to publish
+     * @var bool
+     */
+    protected $isBuiltIn = true;
+
+    /**
      * @var \Magento\Sales\Api\OrderRepositoryInterface
      */
     protected $__orderRepository;

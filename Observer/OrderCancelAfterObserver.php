@@ -11,6 +11,13 @@ use Magento\Framework\Event\Observer as EventObserver;
  */
 class OrderCancelAfterObserver extends KustomerEventObserver
 {
+
+    /**
+     * Tells the publisher to check event is enabled in store config before attempting to publish
+     * @var bool
+     */
+    protected $isBuiltIn = true;
+
     /**
      * @var OrderRepositoryInterface
      */
