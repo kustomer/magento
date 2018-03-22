@@ -2,19 +2,17 @@
 This extension allows publication of Magento events to Kustomer. It provides a `KustomerEventObserver` class that you can extend to publish events to your Kustomer account.
 
 ## Installation
-1. Place the contents of this repo into the following path relative to your store's root installation folder `app/code/Kustomer/KustomerIntegration`
-2. In Magento admin disable cache by going to `System>>Cache Management`
-3. From the root of your magento installation run:
-```shell
-php ­f bin/magento setup:upgrade
-```
-4. Reopen your Magento admin and go to `Stores>>Configuration>>Customers`. A new option called `Kustomer` should be visible.
-5. Don't forget to re-enable your cache!
+1. `$ composer require kustomer/kustomer-integration:1.0.1` from your Magento project root
+2. `$ bin/magento module:enable Kustomer_KustomerIntegration --clear-static-content`
+3. `$ bin/magento setup:upgrade`
+4. `$ bin/magento setup:di:compile`
+
+Find more detailed instructions [here](http://devdocs.magento.com/guides/v2.2/comp-mgr/install-extensions.html)
 
 ### Setup
 Use of this extension requires an active Kustomer subscription. More information about Kustomer can be found on our [website](https://www.kustomer.com).
 
-For now, Magento integration must be enabled manually by our CX team, though you will later be able to install the app from the App Directory when development is complete.
+Before you can start sending data to Kustomer, you must install the Magento app in your Kustomer account. You can do this by logging into the Kustomer app then go to `Settings>>App Directory` and click `Install` for Magento.
 
 Once Magento is enabled on your Kustomer account, you need to create an API key so your Magento store can send data to Kustomer. In the Kustomer app, go to `Settings>>API Keys`. Create a key here with the role `org.user` and keep a copy of the key handy. You will need it.
 
