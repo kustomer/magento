@@ -1,8 +1,5 @@
-FROM alexcheng/magento2
+FROM alexcheng/magento2:2.2.2-integrator
 
-# additional steps:
-# dc exec magento install-magento
-# dc exec magento bash
-# su www-data
-# bin/magento setup:upgrade
-# bin/magento deploy:mode:set developer
+ADD . app/code/Kustomer/KustomerIntegration
+
+CMD ["sh", "-c", "sleep 10 ; install-magento ; /sbin/my_init"]
