@@ -2,11 +2,26 @@
 This extension allows publication of Magento events to Kustomer. It provides a `KustomerEventObserver` class that you can extend to publish events to your Kustomer account.
 
 ## Installation
-1. `$ composer require kustomer/kustomer-integration:1.0.1` from your Magento project root
+1. `$ composer require kustomer/kustomer-integration` from your Magento project root
 2. `$ bin/magento module:enable Kustomer_KustomerIntegration --clear-static-content`
 3. `$ bin/magento setup:upgrade`
 4. `$ bin/magento setup:di:compile`
 
+**Note:** If you are using the default magento metapackage, you will need to add the packagist repo to your store's `composer.json`:
+```json
+{
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        },
+        {
+            "type": "composer",
+            "url": "https://packagist.org"
+        }
+    ]
+}
+```
 Find more detailed instructions [here](http://devdocs.magento.com/guides/v2.2/comp-mgr/install-extensions.html)
 
 ### Setup
