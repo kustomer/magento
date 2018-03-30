@@ -3,6 +3,7 @@
 namespace Kustomer\KustomerIntegration\Observer;
 
 use Kustomer\KustomerIntegration\Helper\Data;
+use Kustomer\KustomerIntegration\Model\EventFactory;
 use Magento\Framework\Event\Observer as EventObserver;
 use Magento\Sales\Api\OrderRepositoryInterface;
 
@@ -19,12 +20,19 @@ class CheckoutSuccessActionObserver extends KustomerEventObserver
      */
     protected $__orderRepository;
 
+    /**
+     * CheckoutSuccessActionObserver constructor.
+     * @param Data $kustomerDataHelper
+     * @param EventFactory $eventFactory
+     * @param OrderRepositoryInterface $orderRepository
+     */
     public function __construct(
         Data $kustomerDataHelper,
+        EventFactory $eventFactory,
         OrderRepositoryInterface $orderRepository
     )
     {
-        parent::__construct($kustomerDataHelper);
+        parent::__construct($kustomerDataHelper, $eventFactory);
         $this->__orderRepository = $orderRepository;
     }
 
@@ -40,16 +48,20 @@ class CheckoutSuccessActionObserver extends KustomerEventObserver
          */
         $orderId = $observer->getEvent()->getData()['order_ids'][0];
         $order = $this->__orderRepository->get($orderId);
-        $eventName = $observer->getEvent()->getName();
-        $customer = $order->getCustomerId();
-        $store = $order->getStoreId();
+
 
         if (empty($order))
         {
-            $this->logger->warning('kustomer: no order found with id '.$orderId.'. skipping.');
+            if (!empty($this->logger))
+            {
+                $this->logger->warning('kustomer: no order found with id '.$orderId.'. skipping.');
+            }
             return;
         }
 
+        $eventName = $observer->getEvent()->getName();
+        $customer = $order->getCustomerId();
+        $store = $order->getStoreId();
         $objectType = 'order';
         $data = $this->__helperData->normalizeOrder($order);
         $this->publish($objectType, $data, $customer, $store, $eventName);
