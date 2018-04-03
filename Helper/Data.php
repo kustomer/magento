@@ -3,10 +3,14 @@
 namespace Kustomer\KustomerIntegration\Helper;
 
 use Magento\Framework\App\Helper\Context;
+use Magento\Quote\Model\Quote\Payment;
+use Magento\Quote\Model\QuoteRepository;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\RegionInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\Pricing\Helper\Data as PricingHelper;
+use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\HTTP\Client\Curl;
@@ -30,6 +34,8 @@ class Data extends AbstractHelper
 
     public $customerRepository;
     public $storeManagerInterface;
+    public $quoteRepository;
+    public $pricingHelper;
     public $curl;
     public $logger;
 
@@ -37,11 +43,15 @@ class Data extends AbstractHelper
         Context $context,
         StoreManagerInterface $storeManagerInterface,
         CustomerRepositoryInterface $customerRepository,
+        QuoteRepository $quoteRepository,
+        PricingHelper $pricingHelper,
         Curl $curl,
         LoggerInterface $logger
     )
     {
         parent::__construct($context);
+        $this->quoteRepository = $quoteRepository;
+        $this->pricingHelper = $pricingHelper;
         $this->storeManagerInterface = $storeManagerInterface;
         $this->customerRepository = $customerRepository;
         $this->curl = $curl;
@@ -62,6 +72,36 @@ class Data extends AbstractHelper
     }
 
     /**
+ * @param \Magento\Customer\Api\Data\AddressInterface|\Magento\Sales\Api\Data\OrderAddressInterface|QuoteAddress $address
+     * @return array
+     */
+    public function normalizeAddress($address)
+    {
+        $street = $address->getStreet();
+
+        if (is_array($street)) {
+            $street = implode(' ', $street);
+        }
+
+        $region = $address->getRegion();
+
+        $n = array(
+            'street' => $street,
+            'city' => $address->getCity(),
+            'zip' => $address->getPostcode(),
+            'country' => $address->getCountryId()
+        );
+
+        if ($region instanceof RegionInterface) {
+            $n['state'] = $region->getRegion();
+        } else if (is_string($region)) {
+            $n['state'] = $region;
+        }
+
+        return $n;
+    }
+
+    /**
      * @param \Magento\Customer\Api\Data\AddressInterface[] $addresses
      * @return mixed[]
      */
@@ -74,31 +114,20 @@ class Data extends AbstractHelper
         }
 
         foreach ($addresses as $address) {
-            $street = $address->getStreet();
-
-            if (is_array($street)) {
-                $street = implode(' ', $street);
-            }
-
-            $region = $address->getRegion();
-
-            $n = array(
-                'street' => $street,
-                'city' => $address->getCity(),
-                'zip' => $address->getPostcode(),
-                'country' => $address->getCountryId()
-            );
-
-            if ($region instanceof RegionInterface) {
-                $n['state'] = $region->getRegion();
-            } else if (is_string($region)) {
-                $n['state'] = $region;
-            }
-
+            $n = $this->normalizeAddress($address);
             array_push($normal, $n);
         }
 
         return $normal;
+    }
+
+    /**
+     * @param float $value
+     * @return string
+     */
+    public function normalizeCurrencyValue($value)
+    {
+        return $this->pricingHelper->currency($value, true, false);
     }
 
     /**
@@ -128,19 +157,67 @@ class Data extends AbstractHelper
      */
     public function normalizeOrder($order)
     {
-        return array(
+        $quote = $this->quoteRepository->get($order->getQuoteId());
+        $shippingAddress = $quote->getShippingAddress();
+        $billingAddress = $order->getBillingAddress();
+        $paymentData = $quote->getPayment();
+        $orderArray = array(
             'id' => $order->getEntityId(),
             'items' => $this->normalizeOrderItems($order->getItems()),
             'state' => $order->getState(),
             'status' => $order->getStatus(),
             'currency_code' => $order->getOrderCurrencyCode(),
-            'shipping_amount' => $order->getShippingAmount(),
-            'subtotal' => $order->getSubtotal(),
-            'total_due' => $order->getTotalDue(),
-            'total_discount' => $order->getDiscountAmount(),
-            'total_paid' => $order->getTotalPaid(),
-            'total_refunded' => $order->getTotalRefunded(),
+            'subtotal' => $this->normalizeCurrencyValue($order->getSubtotal()),
+            'total_due' => $this->normalizeCurrencyValue($order->getTotalDue()),
+            'total_discount' => $this->normalizeCurrencyValue($order->getDiscountAmount()),
+            'total_paid' => $this->normalizeCurrencyValue($order->getTotalPaid()),
+            'total_refunded' => $this->normalizeCurrencyValue($order->getTotalRefunded()),
             'extension_attributes' => $order->getExtensionAttributes()
+        );
+
+        if (!empty($paymentData)) {
+            $payment = $this->normalizePayment($paymentData);
+            foreach ($payment as $key => $value) {
+                $orderArray['payment_'.$key] = $value;
+            }
+            unset($key);
+            unset($value);
+        }
+
+        if (!empty($shippingAddress)) {
+            $shipping = $this->normalizeShipping($shippingAddress);
+            foreach ($shipping as $key => $value)
+            {
+                $orderArray['shipping_'.$key] = $value;
+            }
+            unset($key);
+            unset($value);
+        }
+
+        if (!empty($billingAddress)) {
+            $billing = $this->normalizeAddress($billingAddress);
+            foreach ($billing as $key => $value) {
+                $orderArray['billing_'.$key] = $value;
+            }
+            unset($key);
+            unset($value);
+        }
+
+        return $orderArray;
+    }
+
+    /**
+     * @param Payment $payment
+     * @return array
+     */
+    public function normalizePayment(Payment $payment)
+    {
+        return array(
+            'method' => $payment->getMethod(),
+            'cc_last4' => $payment->getCcLast4(),
+            'po_number' => $payment->getPoNumber(),
+            'updated_at' => $payment->getUpdatedAt(),
+            'created_at' => $payment->getCreatedAt()
         );
     }
 
@@ -181,12 +258,28 @@ class Data extends AbstractHelper
                 'sku' => $item->getSku(),
                 'product_id' => $item->getProductId(),
                 'quantity' => $item->getQtyOrdered(),
-                'price' => $item->getPrice(),
-                'discount' => $item->getDiscountAmount(),
-                'total' => $item->getRowTotal()
+                'price' => $this->normalizeCurrencyValue($item->getPrice()),
+                'discount' => $this->normalizeCurrencyValue($item->getDiscountAmount()),
+                'total' => $this->normalizeCurrencyValue($item->getRowTotal()),
             ));
         }
         return $normalized;
+    }
+
+    /**
+     * @param  QuoteAddress $shipping
+     * @return array
+     */
+    public function normalizeShipping($shipping)
+    {
+        return array_merge(
+            array(
+                'description' => $shipping->getShippingDescription(),
+                'method' => $shipping->getShippingMethod(),
+                'amount' => $this->normalizeCurrencyValue($shipping->getShippingAmount()),
+            ),
+            $this->normalizeAddress($shipping)
+        );
     }
 
     /**
