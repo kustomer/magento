@@ -109,6 +109,9 @@ class DataTest extends \PHPUnit\Framework\TestCase
         $billing
     )
     {
+        $prec = ini_get('serialize_precision');
+        ini_set('serialize_precision', 3);
+
         $itemMock = $this->getMockBuilder(\Magento\Sales\Api\Data\OrderItemInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -375,6 +378,7 @@ class DataTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->model->normalizeOrder($order);
         $this->assertEquals($fixture, $result);
+        ini_set('serialize_precision', $prec);
     }
 
     public function dataProviderNormalizeOrderReturnArray()
@@ -390,23 +394,23 @@ class DataTest extends \PHPUnit\Framework\TestCase
                             'sku' => 'foobar123',
                             'product_id' => 44,
                             'quantity' => 1,
-                            'price' => '$4.99',
-                            'discount' => '$0.00',
-                            'total' => '$4.99'
+                            'price' => 4.99,
+                            'discount' => 0.00,
+                            'total' => 4.99
                         ]
                     ],
                     'currency_code' => 'USD',
-                    'subtotal' => '$4.99',
-                    'total_due' => '$6.32',
-                    'total_discount' => '$0.00',
-                    'total_paid' => '$0.00',
-                    'total_refunded' => '$0.00',
+                    'subtotal' => 4.99,
+                    'total_due' => 6.32,
+                    'total_discount' => 0.0,
+                    'total_paid' => 0.0,
+                    'total_refunded' => 0.0,
                     'extension_attributes' => [],
                     'state' => 'new',
                     'status' => 'pending',
                     'shipping_description' => 'UPS Next Day Air',
                     'shipping_method' => 'ups_1D',
-                    'shipping_amount' => '$1.33',
+                    'shipping_amount' => 1.33,
                     'shipping_street' => '5808 Lake Washington Blvd Suite 700',
                     'shipping_state' => 'Washington',
                     'shipping_city' => 'Kirkland',
