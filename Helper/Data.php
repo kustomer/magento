@@ -125,9 +125,9 @@ class Data extends AbstractHelper
      * @param float $value
      * @return string
      */
-    public function normalizeCurrencyValue($value)
+    public function normalizeNumericValue($value)
     {
-        return $this->pricingHelper->currency($value, true, false);
+        return round((float)$value, 2);
     }
 
     /**
@@ -167,11 +167,11 @@ class Data extends AbstractHelper
             'state' => $order->getState(),
             'status' => $order->getStatus(),
             'currency_code' => $order->getOrderCurrencyCode(),
-            'subtotal' => $this->normalizeCurrencyValue($order->getSubtotal()),
-            'total_due' => $this->normalizeCurrencyValue($order->getTotalDue()),
-            'total_discount' => $this->normalizeCurrencyValue($order->getDiscountAmount()),
-            'total_paid' => $this->normalizeCurrencyValue($order->getTotalPaid()),
-            'total_refunded' => $this->normalizeCurrencyValue($order->getTotalRefunded()),
+            'subtotal' => $this->normalizeNumericValue($order->getSubtotal()),
+            'total_due' => $this->normalizeNumericValue($order->getTotalDue()),
+            'total_discount' => $this->normalizeNumericValue($order->getDiscountAmount()),
+            'total_paid' => $this->normalizeNumericValue($order->getTotalPaid()),
+            'total_refunded' => $this->normalizeNumericValue($order->getTotalRefunded()),
             'extension_attributes' => $order->getExtensionAttributes()
         );
 
@@ -257,10 +257,10 @@ class Data extends AbstractHelper
                 'name' => $item->getName(),
                 'sku' => $item->getSku(),
                 'product_id' => $item->getProductId(),
-                'quantity' => $item->getQtyOrdered(),
-                'price' => $this->normalizeCurrencyValue($item->getPrice()),
-                'discount' => $this->normalizeCurrencyValue($item->getDiscountAmount()),
-                'total' => $this->normalizeCurrencyValue($item->getRowTotal()),
+                'quantity' => $this->normalizeNumericValue($item->getQtyOrdered()),
+                'price' => $this->normalizeNumericValue($item->getPrice()),
+                'discount' => $this->normalizeNumericValue($item->getDiscountAmount()),
+                'total' => $this->normalizeNumericValue($item->getRowTotal()),
             ));
         }
         return $normalized;
@@ -276,7 +276,7 @@ class Data extends AbstractHelper
             array(
                 'description' => $shipping->getShippingDescription(),
                 'method' => $shipping->getShippingMethod(),
-                'amount' => $this->normalizeCurrencyValue($shipping->getShippingAmount()),
+                'amount' => $this->normalizeNumericValue($shipping->getShippingAmount()),
             ),
             $this->normalizeAddress($shipping)
         );
