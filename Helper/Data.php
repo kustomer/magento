@@ -257,7 +257,7 @@ class Data extends AbstractHelper
                 'name' => $item->getName(),
                 'sku' => $item->getSku(),
                 'product_id' => $item->getProductId(),
-                'quantity' => $item->getQtyOrdered(),
+                'quantity' => $this->normalizeNumericValue($item->getQtyOrdered()),
                 'price' => $this->normalizeNumericValue($item->getPrice()),
                 'discount' => $this->normalizeNumericValue($item->getDiscountAmount()),
                 'total' => $this->normalizeNumericValue($item->getRowTotal()),
