@@ -2,7 +2,7 @@
   "name": "kustomer/kustomer-integration",
   "description": "Integrate Magento eCommerce site with Kustomer service",
   "type": "magento2-module",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "license": [
     "OSL-3.0",
     "AFL-3.0"

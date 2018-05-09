@@ -3,7 +3,6 @@
 namespace Kustomer\KustomerIntegration\Observer;
 
 use Kustomer\KustomerIntegration\Model\Event;
-use Kustomer\KustomerIntegration\Model\EventFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Customer\Model\Data\Customer;
 use Magento\Customer\Api\Data\CustomerInterface;
@@ -41,7 +40,7 @@ abstract class KustomerEventObserver implements ObserverInterface
     protected $__customerRepository;
 
     /**
-     * @var EventFactory
+     * @var \Kustomer\KustomerIntegration\Model\EventFactory $eventFactory
      */
     protected $eventFactory;
 
@@ -97,11 +96,11 @@ abstract class KustomerEventObserver implements ObserverInterface
     /**
      * KustomerEventObserver constructor.
      * @param Data $kustomerDataHelper
-     * @param EventFactory $eventFactory
+     * @param \Kustomer\KustomerIntegration\Model\EventFactory $eventFactory
      */
     public function __construct(
         Data $kustomerDataHelper,
-        EventFactory $eventFactory
+        \Kustomer\KustomerIntegration\Model\EventFactory $eventFactory
     )
     {
         $this->__helperData = $kustomerDataHelper;
