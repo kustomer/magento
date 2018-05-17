@@ -14,7 +14,6 @@ use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\HTTP\Client\Curl;
-use Psr\Log\LoggerInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -45,8 +44,7 @@ class Data extends AbstractHelper
         CustomerRepositoryInterface $customerRepository,
         QuoteRepository $quoteRepository,
         PricingHelper $pricingHelper,
-        Curl $curl,
-        LoggerInterface $logger
+        Curl $curl
     )
     {
         parent::__construct($context);
@@ -55,7 +53,7 @@ class Data extends AbstractHelper
         $this->storeManagerInterface = $storeManagerInterface;
         $this->customerRepository = $customerRepository;
         $this->curl = $curl;
-        $this->logger = $logger;
+        $this->logger = $context->getLogger();
     }
 
     /**

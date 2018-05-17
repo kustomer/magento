@@ -1,0 +1,13 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Kustomer\KustomerIntegration\Model\Event" shared="false">
+        <arguments>
+            <argument name="resource" shared="false" xsi:type="object">\Kustomer\KustomerIntegration\Model\ResourceModel\Event</argument>
+            <argument name="resourceCollection" xsi:type="object">\Kustomer\KustomerIntegration\Model\ResourceModel\Event\Collection</argument>
+        </arguments>
+    </type>
+    <type name="Kustomer\KustomerIntegration\Model\ResourceModel\Event\Collection">
+        <arguments>
+            <argument name="resource" shared="false" xsi:type="object">\Kustomer\KustomerIntegration\Model\ResourceModel\Event</argument>
+        </arguments>
+    </type>
+</config>

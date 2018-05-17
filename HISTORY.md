@@ -1,5 +1,9 @@
 ### Kustomer Integration for Magento Update History
 
+#### 1.1.2
+
+- Minor internal changes that should have no functional impact
+
 #### 1.1.1
 
 - Updates `composer.json` php dependency to `^7.1.0`

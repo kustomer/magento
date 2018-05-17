@@ -2,6 +2,7 @@
 
 namespace Kustomer\KustomerIntegration\Model;
 
+use Kustomer\KustomerIntegration\Model\ResourceModel\Event as EventResourceModel;
 use Magento\Framework\Exception\LocalizedException;
 
 class Event extends \Magento\Framework\Model\AbstractModel
@@ -33,13 +34,15 @@ class Event extends \Magento\Framework\Model\AbstractModel
     )
     {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        $this->_resourceCollection->setModel(get_class($this));
+        $this->_resourceCollection->setResourceModel(get_class($this->_resource));
         $this->scopeConfig = $scopeConfig;
         $this->dateTime = $dateTime;
     }
 
     protected function _construct()
     {
-        $this->_init(\Kustomer\KustomerIntegration\Model\ResourceModel\Event::class);
+        $this->_init(get_class($this->_resource));
     }
 
     /**

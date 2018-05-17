@@ -26,14 +26,16 @@ class OrderCancelAfterObserver extends KustomerEventObserver
     /**
      * OrderCancelAfterObserver constructor.
      * @param Data $kustomerDataHelper
+     * @param \Kustomer\KustomerIntegration\Model\EventFactory $eventFactory
      * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
         Data $kustomerDataHelper,
+        \Kustomer\KustomerIntegration\Model\EventFactory $eventFactory,
         OrderRepositoryInterface $orderRepository
     )
     {
-        parent::__construct($kustomerDataHelper);
+        parent::__construct($kustomerDataHelper, $eventFactory);
         $this->__orderRepository = $orderRepository;
     }
 
