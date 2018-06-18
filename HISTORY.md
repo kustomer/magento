@@ -1,5 +1,9 @@
 ### Kustomer Integration for Magento Update History
 
+#### 1.1.3
+
+- Remove use of `\Magento\Framework\HTTP\Client\Curl`
+
 #### 1.1.2
 
 - Minor internal changes that should have no functional impact
