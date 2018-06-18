@@ -13,7 +13,6 @@ use Magento\Framework\Pricing\Helper\Data as PricingHelper;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Framework\HTTP\Client\Curl;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -35,7 +34,6 @@ class Data extends AbstractHelper
     public $storeManagerInterface;
     public $quoteRepository;
     public $pricingHelper;
-    public $curl;
     public $logger;
 
     public function __construct(
@@ -43,8 +41,7 @@ class Data extends AbstractHelper
         StoreManagerInterface $storeManagerInterface,
         CustomerRepositoryInterface $customerRepository,
         QuoteRepository $quoteRepository,
-        PricingHelper $pricingHelper,
-        Curl $curl
+        PricingHelper $pricingHelper
     )
     {
         parent::__construct($context);
@@ -52,7 +49,6 @@ class Data extends AbstractHelper
         $this->pricingHelper = $pricingHelper;
         $this->storeManagerInterface = $storeManagerInterface;
         $this->customerRepository = $customerRepository;
-        $this->curl = $curl;
         $this->logger = $context->getLogger();
     }
 
@@ -350,24 +346,36 @@ class Data extends AbstractHelper
     {
         $authToken = $this->getKustomerApiKey($store);
         $headers = array(
-            'Authorization' => 'Bearer '.$authToken,
-            'User-Agent' => self::USER_AGENT.self::VERSION,
-            'Accept' => self::ACCEPT_HEADER,
-            'Content-Type' => self::CONTENT_TYPE,
+            'Authorization: Bearer '.$authToken,
+            'User-Agent: '.self::USER_AGENT.self::VERSION,
+            'Accept: '.self::ACCEPT_HEADER,
+            'Content-Type: '.self::CONTENT_TYPE,
         );
 
-        $this->curl->setHeaders($headers);
-        try {
-            $this->curl->post($uri, $body);
-        } catch (\Exception $e) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $uri);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 3000);
+
+        // $this->curl->setHeaders($headers);
+        $res = curl_exec($ch);
+        $e = curl_error($ch);
+        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $bodyMessage = substr($res, $header_size);
+
+        if ($e)
+        {
             return [
-              'success' => false,
-              'error' => $e->getCode().': '.$e->getMessage()
+                'success' => false,
+                'error' => $e,
             ];
         }
-
-        $statusCode = $this->curl->getStatus();
-        $bodyMessage = $this->curl->getBody();
 
         if ($statusCode >= 400)
         {

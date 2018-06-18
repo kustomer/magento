@@ -40,11 +40,6 @@ class DataTest extends \PHPUnit\Framework\TestCase
     protected $pricingHelper;
 
     /**
-     * @var \Magento\Framework\HTTP\Client\Curl | \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $curl;
-
-    /**
      * @var \Psr\Log\LoggerInterface | \PHPUnit_Framework_MockObject_MockObject
      */
     protected $logger;
@@ -74,10 +69,6 @@ class DataTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->curl = $this->getMockBuilder(\Magento\Framework\HTTP\Client\Curl::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -88,7 +79,6 @@ class DataTest extends \PHPUnit\Framework\TestCase
             $this->customerRepository,
             $this->quoteRepository,
             $this->pricingHelper,
-            $this->curl,
             $this->logger
         );
     }
