@@ -62,6 +62,18 @@ abstract class KustomerEventObserver implements ObserverInterface
     }
 
     /**
+     * @param mixed[] $data
+     */
+    protected function __guestCustomerFromOrder($data)
+    {
+        $customerArray = array(
+            'email' => $data['customer_email'],
+            'guest' => True,
+        );
+        return $customerArray;
+    }
+
+    /**
      * @param string $eventName ,
      * @param string $dataType ,
      * @param mixed[] $data
@@ -72,7 +84,9 @@ abstract class KustomerEventObserver implements ObserverInterface
     {
         $uri = $this->__helperData->getUriByCustomer($customer);
 
-        if (is_int($store) || is_string($store) || empty($store))
+        if (is_int($store) || is_string($store)) {
+            $store = $this->__storeRepository->getStore($store);
+        } elseif (!customer['guest'] && empty($store))
         {
             $store_id = $customer->getStoreId();
             $store = $this->__storeRepository->getStore($store_id);
@@ -138,8 +152,7 @@ abstract class KustomerEventObserver implements ObserverInterface
 
         if (!$customer instanceof CustomerInterface)
         {
-            $this->logger->error('no customer provided for event '.$eventName);
-            return;
+            $customer = $this->__guestCustomerFromOrder($data);
         }
 
         if ($dataType === 'customer' && empty($data))

@@ -130,7 +130,9 @@ class Data extends AbstractHelper
      */
     public function normalizeCustomer($customer)
     {
-
+        if ($customer['guest']) {
+            return $customer;
+        }
         return array(
             'id' => $customer->getId(),
             'name' => $customer->getFirstname().' '.$customer->getLastname(),
@@ -155,6 +157,7 @@ class Data extends AbstractHelper
         $shippingAddress = $quote->getShippingAddress();
         $billingAddress = $order->getBillingAddress();
         $paymentData = $quote->getPayment();
+        $customer_email = $order->getCustomerEmail();
         $orderArray = array(
             'id' => $order->getEntityId(),
             'items' => $this->normalizeOrderItems($order->getItems()),
@@ -166,7 +169,7 @@ class Data extends AbstractHelper
             'total_discount' => $this->normalizeNumericValue($order->getDiscountAmount()),
             'total_paid' => $this->normalizeNumericValue($order->getTotalPaid()),
             'total_refunded' => $this->normalizeNumericValue($order->getTotalRefunded()),
-            'extension_attributes' => $order->getExtensionAttributes()
+            'extension_attributes' => $order->getExtensionAttributes(),
         );
 
         if (!empty($paymentData)) {
@@ -176,6 +179,11 @@ class Data extends AbstractHelper
             }
             unset($key);
             unset($value);
+        }
+
+        if(!empty($customer_email)) {
+
+            $orderArray['customer_email'] = $customer_email;
         }
 
         if (!empty($shippingAddress)) {
@@ -304,7 +312,7 @@ class Data extends AbstractHelper
      */
     public function getUriByCustomer($customer)
     {
-        $customerId = $customer->getId();
+        $customerId = $customer['guest'] ? 'guest' : $customer->getId();
         $baseUri = $this->getKustomerUri().self::BASE_KUSTOMER_URI;
         return $baseUri.$customerId.'/'.self::API_ENDPOINT;
     }
