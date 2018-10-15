@@ -161,6 +161,7 @@ class Data extends AbstractHelper
         $paymentData = $quote->getPayment();
         $orderArray = array(
             'id' => $order->getEntityId(),
+            'increment_id' => $order->getIncrementId(),
             'items' => $this->normalizeOrderItems($order->getItems()),
             'state' => $order->getState(),
             'status' => $order->getStatus(),

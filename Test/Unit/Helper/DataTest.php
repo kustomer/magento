@@ -186,6 +186,11 @@ class DataTest extends \PHPUnit\Framework\TestCase
 
         $order
             ->expects($this->once())
+            ->method('getIncrementId')
+            ->willReturn($fixture['increment_id']);
+
+        $order
+            ->expects($this->once())
             ->method('getEntityId')
             ->willReturn($fixture['id']);
 
@@ -378,6 +383,7 @@ class DataTest extends \PHPUnit\Framework\TestCase
             [
                 'fixture' => [
                     'id' => 3,
+                    'increment_id' => 1249920111,
                     'items' => [
                         [
                             'name' => 'foo',
