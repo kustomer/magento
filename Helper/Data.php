@@ -159,7 +159,6 @@ class Data extends AbstractHelper
         $shippingAddress = $quote->getShippingAddress();
         $billingAddress = $order->getBillingAddress();
         $paymentData = $quote->getPayment();
-        $customer_email = $order->getCustomerEmail();
         $orderArray = array(
             'id' => $order->getEntityId(),
             'items' => $this->normalizeOrderItems($order->getItems()),
