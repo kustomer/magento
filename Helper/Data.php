@@ -130,7 +130,7 @@ class Data extends AbstractHelper
      */
     public function normalizeCustomer($customer)
     {
-        if ($customer['guest']) {
+        if (is_array($customer) && $customer['guest']) {
             return $customer;
         }
         return array(
@@ -317,7 +317,11 @@ class Data extends AbstractHelper
      */
     public function getUriByCustomer($customer)
     {
-        $customerId = $customer['guest'] ? 'guest' : $customer->getId();
+        if (is_array($customer) && $customer['guest']) {
+            $customerId = 'guest';
+        } else {
+            $customerId = $customer->getId();
+        }
         $baseUri = $this->getKustomerUri().self::BASE_KUSTOMER_URI;
         return $baseUri.$customerId.'/'.self::API_ENDPOINT;
     }
