@@ -153,7 +153,9 @@ class Data extends AbstractHelper
      */
     public function normalizeOrder($order)
     {
+
         $quote = $this->quoteRepository->get($order->getQuoteId());
+
         $shippingAddress = $quote->getShippingAddress();
         $billingAddress = $order->getBillingAddress();
         $paymentData = $quote->getPayment();
@@ -181,9 +183,12 @@ class Data extends AbstractHelper
             unset($value);
         }
 
-        if(!empty($customer_email)) {
+        if($order->getCustomerIsGuest()) {
+            $customer_email = $order->getCustomerEmail();
+            $customer_name = $order->getBillingAddress()->getName();
 
             $orderArray['customer_email'] = $customer_email;
+            $orderArray['customer_name'] = $customer_name;
         }
 
         if (!empty($shippingAddress)) {

@@ -68,6 +68,7 @@ abstract class KustomerEventObserver implements ObserverInterface
     {
         $customerArray = array(
             'email' => $data['customer_email'],
+            'name' => $data['customer_name'],
             'guest' => True,
         );
         return $customerArray;
@@ -86,7 +87,7 @@ abstract class KustomerEventObserver implements ObserverInterface
 
         if (is_int($store) || is_string($store)) {
             $store = $this->__storeRepository->getStore($store);
-        } elseif (!customer['guest'] && empty($store))
+        } elseif (!$customer['guest'] && empty($store))
         {
             $store_id = $customer->getStoreId();
             $store = $this->__storeRepository->getStore($store_id);
