@@ -130,7 +130,9 @@ class Data extends AbstractHelper
      */
     public function normalizeCustomer($customer)
     {
-
+        if (is_array($customer) && $customer['guest']) {
+            return $customer;
+        }
         return array(
             'id' => $customer->getId(),
             'name' => $customer->getFirstname().' '.$customer->getLastname(),
@@ -151,7 +153,9 @@ class Data extends AbstractHelper
      */
     public function normalizeOrder($order)
     {
+
         $quote = $this->quoteRepository->get($order->getQuoteId());
+
         $shippingAddress = $quote->getShippingAddress();
         $billingAddress = $order->getBillingAddress();
         $paymentData = $quote->getPayment();
@@ -167,7 +171,7 @@ class Data extends AbstractHelper
             'total_discount' => $this->normalizeNumericValue($order->getDiscountAmount()),
             'total_paid' => $this->normalizeNumericValue($order->getTotalPaid()),
             'total_refunded' => $this->normalizeNumericValue($order->getTotalRefunded()),
-            'extension_attributes' => $order->getExtensionAttributes()
+            'extension_attributes' => $order->getExtensionAttributes(),
         );
 
         if (!empty($paymentData)) {
@@ -177,6 +181,14 @@ class Data extends AbstractHelper
             }
             unset($key);
             unset($value);
+        }
+
+        if($order->getCustomerIsGuest()) {
+            $customer_email = $order->getCustomerEmail();
+            $customer_name = $order->getBillingAddress()->getName();
+
+            $orderArray['customer_email'] = $customer_email;
+            $orderArray['customer_name'] = $customer_name;
         }
 
         if (!empty($shippingAddress)) {
@@ -305,7 +317,11 @@ class Data extends AbstractHelper
      */
     public function getUriByCustomer($customer)
     {
-        $customerId = $customer->getId();
+        if (is_array($customer) && $customer['guest']) {
+            $customerId = 'guest';
+        } else {
+            $customerId = $customer->getId();
+        }
         $baseUri = $this->getKustomerUri().self::BASE_KUSTOMER_URI;
         return $baseUri.$customerId.'/'.self::API_ENDPOINT;
     }

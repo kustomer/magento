@@ -62,6 +62,19 @@ abstract class KustomerEventObserver implements ObserverInterface
     }
 
     /**
+     * @param mixed[] $data
+     */
+    protected function __guestCustomerFromOrder($data)
+    {
+        $customerArray = array(
+            'email' => $data['customer_email'],
+            'name' => $data['customer_name'],
+            'guest' => True,
+        );
+        return $customerArray;
+    }
+
+    /**
      * @param string $eventName ,
      * @param string $dataType ,
      * @param mixed[] $data
@@ -72,7 +85,9 @@ abstract class KustomerEventObserver implements ObserverInterface
     {
         $uri = $this->__helperData->getUriByCustomer($customer);
 
-        if (is_int($store) || is_string($store) || empty($store))
+        if (is_int($store) || is_string($store)) {
+            $store = $this->__storeRepository->getStore($store);
+        } elseif (!is_array($customer) && empty($store))
         {
             $store_id = $customer->getStoreId();
             $store = $this->__storeRepository->getStore($store_id);
@@ -136,8 +151,9 @@ abstract class KustomerEventObserver implements ObserverInterface
             $customer = $this->__getCustomerById($customer->getId());
         }
 
-        if (!$customer instanceof CustomerInterface)
-        {
+        if ((!$customer instanceof CustomerInterface) && ($eventName === 'checkout_onepage_controller_success_action')) {
+            $customer = $this->__guestCustomerFromOrder($data);
+        } elseif (!$customer instanceof CustomerInterface) {
             $this->logger->error('no customer provided for event '.$eventName);
             return;
         }
