@@ -151,9 +151,11 @@ abstract class KustomerEventObserver implements ObserverInterface
             $customer = $this->__getCustomerById($customer->getId());
         }
 
-        if (!$customer instanceof CustomerInterface)
-        {
+        if ((!$customer instanceof CustomerInterface) && ($eventName === 'checkout_onepage_controller_success_action')) {
             $customer = $this->__guestCustomerFromOrder($data);
+        } elseif (!$customer instanceof CustomerInterface) {
+            $this->logger->error('no customer provided for event '.$eventName);
+            return;
         }
 
         if ($dataType === 'customer' && empty($data))
