@@ -21,6 +21,7 @@ class Data extends AbstractHelper
     const XML_PATH_EVENT = 'kustomer/event/';
     const XML_PATH_ENABLED = 'kustomer/integration/active';
     const XML_PATH_API_KEY = 'kustomer/integration/api_key';
+    const XML_PATH_ORG_NAME = 'kustomer/integration/org_name';
     const API_ENDPOINT = 'events';
     const ACCEPT_HEADER = 'application/json';
     const KUSTOMER_DOMAIN = 'https://api.kustomerapp.com';
@@ -53,16 +54,24 @@ class Data extends AbstractHelper
     }
 
     /**
+     * @param string $subdomain
      * @return string
      */
-    public function getKustomerUri()
+    public function getKustomerUri($subdomain)
     {
         $domain = getenv('KUSTOMER_API_DOMAIN');
+
         if (empty($domain))
         {
-            return self::KUSTOMER_DOMAIN;
+            $domain = self::KUSTOMER_DOMAIN;
         }
-        return $domain;
+
+        $domainParts = explode("://", $domain, 2);
+
+        $protocol = $domainParts[0];
+        $host = $domainParts[1];
+
+        return "$protocol://$subdomain.$host";
     }
 
     /**
@@ -312,17 +321,28 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param CustomerInterface $customer
+     * @param Store|null $store
      * @return string
      */
-    public function getUriByCustomer($customer)
+    public function getKustomerOrgName($store = null)
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_ORG_NAME, ScopeInterface::SCOPE_STORE, $store);
+    }
+
+    /**
+     * @param CustomerInterface $customer
+     * @param Store|null $store
+     * @return string
+     */
+    public function getUriByCustomer($customer, $store = null)
     {
         if (is_array($customer) && $customer['guest']) {
             $customerId = 'guest';
         } else {
             $customerId = $customer->getId();
         }
-        $baseUri = $this->getKustomerUri().self::BASE_KUSTOMER_URI;
+        $subdomain = $this->getKustomerOrgName($store);
+        $baseUri = $this->getKustomerUri($subdomain).self::BASE_KUSTOMER_URI;
         return $baseUri.$customerId.'/'.self::API_ENDPOINT;
     }
 

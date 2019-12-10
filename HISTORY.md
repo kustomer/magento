@@ -1,5 +1,15 @@
 ### Kustomer Integration for Magento Update History
 
+#### 1.1.5
+
+- Add required org name setting
+- Adjusts base url (api.kustomerapp.com) to use subdomain (org-name.api.kustomerapp.com) to support new Kustomer regions
+
+
+#### 1.1.4
+
+- Add increment_id to event payload in addition to entity_id
+
 #### 1.1.3
 
 - Remove use of `\Magento\Framework\HTTP\Client\Curl`
