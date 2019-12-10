@@ -83,8 +83,6 @@ abstract class KustomerEventObserver implements ObserverInterface
      */
     protected function __publish($eventName, $dataType, $data, $customer, $store = null)
     {
-        $uri = $this->__helperData->getUriByCustomer($customer);
-
         if (is_int($store) || is_string($store)) {
             $store = $this->__storeRepository->getStore($store);
         } elseif (!is_array($customer) && empty($store))
@@ -102,6 +100,8 @@ abstract class KustomerEventObserver implements ObserverInterface
                 'data' => $data
             ]
         ]);
+
+        $uri = $this->__helperData->getUriByCustomer($customer, $store->getId());
 
         /** @var Event $event */
         $event = $this->eventFactory->create();
