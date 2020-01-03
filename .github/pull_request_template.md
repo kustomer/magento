@@ -2,11 +2,11 @@
 
 [Short summary of changes]
 
-Closes kustomer/development#
+Closes [KDEV-]#
 
 ## Details (optional)
 
 ## Screenshots (optional)
 ![Screenshot1]()
 
-@kustomer/backend-devs
+
