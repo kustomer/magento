@@ -1,5 +1,9 @@
 ### Kustomer Integration for Magento Update History
 
+#### 1.1.6
+
+- Updates `composer.json` php dependency to `~7.2.0` - `~7.4.0`
+
 #### 1.1.5
 
 - Add required org name setting
