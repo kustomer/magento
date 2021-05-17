@@ -7,7 +7,11 @@ This extension allows publication of Magento events to Kustomer. It provides a `
 3. `$ bin/magento setup:upgrade`
 4. `$ bin/magento setup:di:compile`
 
-**Note:** If you are using the default magento metapackage, you will need to add the packagist repo to your store's `composer.json`:
+### Notes
+
+#### Packagist
+
+If you are using the default magento metapackage, you will need to add the packagist repo to your store's `composer.json`:
 ```json
 {
     "repositories": [
@@ -23,6 +27,12 @@ This extension allows publication of Magento events to Kustomer. It provides a `
 }
 ```
 Find more detailed instructions [here](http://devdocs.magento.com/guides/v2.2/comp-mgr/install-extensions.html)
+
+#### Cron
+
+The extension makes use of a cron job to collect events and send them to Kustomer and thus requires cron to be installed on the Magento server.  
+
+You can check if the cron was installed correctly with `crontab -l`.  If the cron does not show up, run `bin/magento cron:install` in your Magento dir. [This command](https://devdocs.magento.com/guides/v2.4/config-guide/cli/config-cli-subcommands-cron.html) is available with Magento 2.2.
 
 ### Setup
 Use of this extension requires an active Kustomer subscription. More information about Kustomer can be found on our [website](https://www.kustomer.com).
