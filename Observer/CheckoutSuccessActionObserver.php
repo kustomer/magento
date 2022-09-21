@@ -46,19 +46,7 @@ class CheckoutSuccessActionObserver extends KustomerEventObserver
          * @var \Magento\Customer\Model\Customer $customer
          * @var \Magento\Store\Model\Store $store
          */
-        $orderId = $observer->getEvent()->getData()['order_ids'][0];
-        $order = $this->__orderRepository->get($orderId);
-
-
-        if (empty($order))
-        {
-            if (!empty($this->logger))
-            {
-                $this->logger->warning('kustomer: no order found with id '.$orderId.'. skipping.');
-            }
-            return;
-        }
-
+        $order = $observer->getEvent()->getData()['order'];
         $eventName = $observer->getEvent()->getName();
         $customer = $order->getCustomerId();
         $store = $order->getStoreId();
