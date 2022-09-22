@@ -24,7 +24,7 @@
             </group>
             <group id="event" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Event Publication Settings</label>
-                <field id="checkout_submit_all_after" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sales_order_place_after" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>New Order</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
@@ -36,7 +36,7 @@
                     <label>Customer Update</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="order_cancel_after" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sales_order_save_after" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Order Cancel</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
