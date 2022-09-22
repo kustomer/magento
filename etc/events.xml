@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="checkout_submit_all_after">
+    <event name="sales_order_place_after">
         <observer name="kustomer_order_create" instance="Kustomer\KustomerIntegration\Observer\CheckoutSuccessActionObserver" />
     </event>
     <event name="customer_register_success">
@@ -12,7 +12,7 @@
     <event name="customer_address_save_after">
         <observer name="kustomer_customer_address_save_after" instance="Kustomer\KustomerIntegration\Observer\CustomerAddressSaveAfterObserver" />
     </event>
-    <event name="order_cancel_after">
-        <observer name="kustomer_order_canceled" instance="Kustomer\KustomerIntegration\Observer\OrderCancelAfterObserver" />
+    <event name="sales_order_save_after">
+        <observer name="kustomer_order_canceled" instance="Kustomer\KustomerIntegration\Observer\OrderSaveAfterObserver" />
     </event>
 </config>
