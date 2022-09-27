@@ -37,7 +37,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="sales_order_save_after" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Order Cancel</label>
+                    <label>Order Update</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
