@@ -7,9 +7,9 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Framework\Event\Observer as EventObserver;
 
 /**
- * Class OrderCancelAfterObserver
+ * Class OrderSaveAfterObserver
  */
-class OrderCancelAfterObserver extends KustomerEventObserver
+class OrderSaveAfterObserver extends KustomerEventObserver
 {
 
     /**
@@ -24,7 +24,7 @@ class OrderCancelAfterObserver extends KustomerEventObserver
     protected $__orderRepository;
 
     /**
-     * OrderCancelAfterObserver constructor.
+     * OrderSaveAfterObserver constructor.
      * @param Data $kustomerDataHelper
      * @param \Kustomer\KustomerIntegration\Model\EventFactory $eventFactory
      * @param OrderRepositoryInterface $orderRepository
