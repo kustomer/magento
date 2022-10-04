@@ -17,3 +17,11 @@ services:
       - "3306:3306"
     volumes:
       - ~/data/mysql:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - db
+    env_file: .env
+    restart: always
+    ports:
+      - 8081:80

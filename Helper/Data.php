@@ -194,7 +194,7 @@ class Data extends AbstractHelper
 
         if($order->getCustomerIsGuest()) {
             $customer_email = $order->getCustomerEmail();
-            $customer_name = $order->getBillingAddress()->getName();
+            $customer_name = $order->getCustomerName();
 
             $orderArray['customer_email'] = $customer_email;
             $orderArray['customer_name'] = $customer_name;
