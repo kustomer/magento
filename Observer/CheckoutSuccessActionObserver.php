@@ -41,17 +41,23 @@ class CheckoutSuccessActionObserver extends KustomerEventObserver
      */
     public function execute(EventObserver $observer)
     {
-        /**
-         * @var \Magento\Sales\Api\Data\OrderInterface $order
-         * @var \Magento\Customer\Model\Customer $customer
-         * @var \Magento\Store\Model\Store $store
-         */
-        $order = $observer->getEvent()->getData()['order'];
-        $eventName = $observer->getEvent()->getName();
-        $customer = $order->getCustomerId();
-        $store = $order->getStoreId();
-        $objectType = 'order';
-        $data = $this->__helperData->normalizeOrder($order);
-        $this->publish($objectType, $data, $customer, $store, $eventName);
+        try
+        {
+            /**
+             * @var string $eventName
+             * @var \Magento\Sales\Model\Order $orderModel
+             */
+            $eventName = $observer->getEvent()->getName();
+            $order = $observer->getEvent()->getData()['order'];
+            $customer = $order->getCustomerId();
+            $store = $order->getStoreId();
+            $orderData = $this->__helperData->normalizeOrder($order);
+            $dataType = 'order';
+            $this->publish($dataType, $orderData,  $customer, $store, $eventName);
+        }
+        catch (\Error $e)
+        {
+            $this->logger->error('CheckoutSuccessActionObserver ' . $e->getMessage());
+        }
     }
 }
