@@ -1,4 +1,4 @@
-FROM alexcheng/magento2:2.1-developer
+FROM alexcheng/magento2:2.2-developer
 
 ADD . app/code/Kustomer/KustomerIntegration
 

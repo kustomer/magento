@@ -44,18 +44,23 @@ class OrderSaveAfterObserver extends KustomerEventObserver
      */
     public function execute(EventObserver $observer)
     {
-        /**
-         * @var string $eventName
-         * @var \Magento\Sales\Model\Order $orderModel
-         */
-        $eventName = $observer->getEvent()->getName();
-        $orderModel = $observer->getEvent()->getData()['order'];
-        $order = $this->__orderRepository->get($orderModel->getId());
-        $customer = $order->getCustomerId();
-        $store = $order->getStoreId();
-
-        $orderData = $this->__helperData->normalizeOrder($order);
-        $dataType = 'order';
-        $this->publish($dataType, $orderData,  $customer, $store, $eventName);
+        try
+        {
+            /**
+             * @var string $eventName
+             * @var \Magento\Sales\Model\Order $orderModel
+             */
+            $eventName = $observer->getEvent()->getName();
+            $order = $observer->getEvent()->getData()['order'];
+            $customer = $order->getCustomerId();
+            $store = $order->getStoreId();
+            $orderData = $this->__helperData->normalizeOrder($order);
+            $dataType = 'order';
+            $this->publish($dataType, $orderData,  $customer, $store, $eventName);
+        }
+        catch (\Error $e)
+        {
+            $this->logger->error('OrderSaveAfterObserver ' . $e->getMessage());
+        }
     }
 }
