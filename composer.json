@@ -7,7 +7,6 @@
     "OSL-3.0",
     "AFL-3.0"
   ],
-  "_security_note": "Security vulnerabilities identified in dependencies. See SECURITY_PATCH.md for details.",
   "_security_requirements": {
     "_comment": "Minimum versions required to address security vulnerabilities",
     "composer/composer": ">=2.3.5 (CVE-2022-24828, CVE-2021-29472)",
