@@ -149,7 +149,7 @@ Find more detailed instructions [here](http://devdocs.magento.com/guides/v2.2/co
 
 #### Cron
 
-The extension makes use of a cron job to collect events and send them to Kustomer and thus requires cron to be installed on the Adobe Commerce server.  
+The extension makes use of a cron job to collect events and send them to Kustomer and thus requires cron to be installed on the Adobe Commerce server.
 
 You can check if the cron was installed correctly with `crontab -l`.  If the cron does not show up, run `bin/magento cron:install` in your Adobe Commerce dir. [This command](https://devdocs.magento.com/guides/v2.4/config-guide/cli/config-cli-subcommands-cron.html) is available with Adobe Commerce 2.2.
 
@@ -163,10 +163,10 @@ Once Adobe Commerce is enabled on your Kustomer account, you need to create an A
 Next, go to your Adobe Commerce store's admin site and navigate to `Store>>Configuration>>Customers>>Kustomer` (if the `Kustomer` option is not available, see the installation instructions above). Select the store/website you want to integrate with Kustomer (or stay in the default scope if you want to use the integration globally). Enter the API key you generated in Kustomer into the API Key box and make sure the `Enabled` option is set to `Yes`. Next, select any of the default events you want to broadcast to Kustomer (such as when a new Customer is created) and click `Save`. You should be all set!
 
 ### Pausing the Extension
-If you want to stop sending data to Kustomer, you can turn off the extension at any time by returning to the settings page and setting the `Enabled` value to `No`. Note that any data collected while the extension is off will not be sent to Kustomer.  
+If you want to stop sending data to Kustomer, you can turn off the extension at any time by returning to the settings page and setting the `Enabled` value to `No`. Note that any data collected while the extension is off will not be sent to Kustomer.
 
 ## Custom Events and Objects
-While the Kustomer Extension comes with a few pre-made events (new customers, orders, etc.), it is possible to send add your own custom events to Kustomer. To do this, create your own module and make sure `kustomer/kustomer-integration` is one of the requirements in `composer.json`. For more information about creating Adobe Commerce Modules, see the [Adobe Commerce Developer Documentation](http://devdocs.magento.com/guides/v2.2/extension-dev-guide/bk-extension-dev-guide.html). 
+While the Kustomer Extension comes with a few pre-made events (new customers, orders, etc.), it is possible to send add your own custom events to Kustomer. To do this, create your own module and make sure `kustomer/kustomer-integration` is one of the requirements in `composer.json`. For more information about creating Adobe Commerce Modules, see the [Adobe Commerce Developer Documentation](http://devdocs.magento.com/guides/v2.2/extension-dev-guide/bk-extension-dev-guide.html).
 
 Then create an Observer under `Observers/MySubscriptionObserver.php` and extend the `KustomerEventObserver` class. If you wanted to send a custom Subscription object to Kustomer when it is created, you might do something like this:
 
@@ -193,7 +193,7 @@ class MySubscriptionObserver extends KustomerEventObserver
             'plan' => $subscription->getPlan(),
             'term' => $subscription->getTerm(),
             'period_start' => $subscription->getPeriodStart(),
-            'period_end' => $subscription->getPeriodEnd()  
+            'period_end' => $subscription->getPeriodEnd()
         );
         $this->publish($type, $data, $customer);
     }
