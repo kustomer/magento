@@ -1,5 +1,3 @@
-# Kustomer Integration for Magento 2
-
 # Kustomer Extension for Adobe Commerce 2.x
 This extension allows publication of Adobe Commerce events to Kustomer. It provides a `KustomerEventObserver` class that you can extend to publish events to your Kustomer account.
 
