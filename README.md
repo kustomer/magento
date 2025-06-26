@@ -1,3 +1,122 @@
+# Kustomer Integration for Magento 2
+
+## 🔒 Security Notice
+
+**CRITICAL SECURITY VULNERABILITIES IDENTIFIED**
+
+This module's dependencies contain several high and critical severity security vulnerabilities. Please apply the security patches immediately.
+
+### Quick Security Fix
+```bash
+# Run the automated security patch script
+./apply-security-patches.sh
+```
+
+### Manual Security Updates
+If you manage dependencies at the Magento root level:
+```bash
+# Update Composer first
+composer self-update
+
+# Update vulnerable packages to secure versions
+composer require "symfony/process:^6.4.14"
+composer require "zendframework/zend-http:^2.8.1"
+composer require "zendframework/zend-diactoros:^1.8.4"
+```
+
+### Vulnerabilities Addressed
+- **CVE-2022-24828**: Composer command injection (CRITICAL)
+- **CVE-2021-29472**: Composer command injection via Mercurial (HIGH)
+- **CVE-2024-51736**: Symfony Process command execution hijack (HIGH)
+- **ZF2018-01**: Zend-HTTP URL rewrite vulnerability (HIGH)
+- **ZF2018-01**: Zend-Diactoros URL rewrite vulnerability (MODERATE)
+
+**📄 See [SECURITY_PATCH.md](SECURITY_PATCH.md) for detailed information.**
+
+---
+
+## Overview
+
+This extension integrates Magento 2 with the Kustomer platform, enabling seamless customer service management.
+
+## Installation
+
+1. Install via Composer:
+   ```bash
+   composer require kustomer/kustomer-integration
+   ```
+
+2. Enable the module:
+   ```bash
+   php bin/magento module:enable Kustomer_KustomerIntegration
+   php bin/magento setup:upgrade
+   php bin/magento cache:clean
+   ```
+
+## Security Requirements
+
+### Minimum Secure Package Versions
+- `composer/composer`: ≥2.3.5
+- `symfony/process`: ≥5.4.46 || ≥6.4.14 || ≥7.1.7
+- `zendframework/zend-http`: ≥2.8.1
+- `zendframework/zend-diactoros`: ≥1.8.4
+
+### Security Best Practices
+1. Keep all dependencies updated
+2. Run `composer audit` regularly
+3. Monitor security advisories
+4. Filter suspicious HTTP headers at web server level
+
+## Configuration
+
+Configure the extension through:
+- **Admin Panel**: Stores > Configuration > Services > Kustomer Integration
+- **Command Line**: Use Magento CLI commands for bulk operations
+
+## Development
+
+### Requirements
+- PHP 5.5+ || 7.0+ || 7.1+ || 7.2+ || 7.3+ || 7.4+
+- Magento 2.x
+- Secure versions of all dependencies (see security requirements above)
+
+### Testing
+```bash
+# Run unit tests
+phpunit Test/Unit/
+
+# Run security audit
+composer audit
+```
+
+## Support
+
+For security issues, please:
+1. Apply patches immediately using `./apply-security-patches.sh`
+2. Contact your system administrator if patches cannot be applied
+3. For Magento Cloud, coordinate with your hosting provider
+
+For general support:
+- Review the documentation in `DOCUMENTATION.md`
+- Check the troubleshooting guide
+- Contact Kustomer support
+
+## License
+
+Dual licensed under OSL-3.0 and AFL-3.0 licenses.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Apply security patches before development
+4. Test thoroughly including security validation
+5. Submit a pull request
+
+---
+
+**⚠️ SECURITY REMINDER**: Always apply security patches before deploying to production.
+
 # Kustomer Extension for Adobe Commerce 2.x
 This extension allows publication of Adobe Commerce events to Kustomer. It provides a `KustomerEventObserver` class that you can extend to publish events to your Kustomer account.
 
